@@ -61,3 +61,12 @@ void Graphics::showLine(unsigned int line){
 void Graphics::drawElement(){
     return;
 }
+
+
+ACTION Graphics::getUSerAction(){
+    return;
+}
+
+void Graphics::showOnScreen(){
+    return;
+}

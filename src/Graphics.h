@@ -8,7 +8,7 @@ class Graphics
 public:
     Graphics(std::list<terrains_d> newTerrainList, std::list<units_d> newUnitList, std::list<buildings_d> newBuildingList);
     ~Graphics();
-    introduction(); //poner algun presentacion al juego para hacerlo mas copado
+    //introduction(); //poner algun presentacion al juego para hacerlo mas copado
     void updateGraphics(std::list<units_d> unitList,std::list<buildings_d> buildingList);
     ACTION getUserAction();
     void showOnScreen();
