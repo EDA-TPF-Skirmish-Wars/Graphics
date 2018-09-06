@@ -51,24 +51,33 @@ void Graphics::showLine(unsigned int line){
 
     //tengo cargado en las listas los elementos de la fila correspodiente
     for(unsigned int o = 0; o <= terrainsInLine.size(); o++){
-        //drawElement(terrainsInLine[o],line);
+        this->drawTerrain(terrainsInLine[o]);
     }
     for(unsigned int o = 0; o <= buildingsInLine.size(); o++){
-        //drawElement(buildingsInLine[o],line);
+        this->drawBuilding(buildingsInLine[o]);
     }
-    for(unsigned int o = 0; o <= terrainsInLine.size(); o++){
-        //drawElement(buildingsInLine[o],line);
+    for(unsigned int o = 0; o <= unitsInLine.size(); o++){
+        this->drawUnit(unitsInLine[o]);
     }
+    
+    al_flip_display();
     return;
 }
 
-void Graphics::drawElement(ELEMENTO){
+void Graphics::drawTerrain(MartusTerrains terrainToDraw){
     return;
 }
 
+void Graphics::drawBuilding(MartusBuildings buildingToDraw){
+    return;
+}
+
+void Graphics::drawUnit(MartusUnidades unitToDraw){
+    return;
+}
 
 ACTION Graphics::getUserAction(){
-    return;
+    return hola1;
 }
 
 void Graphics::showOnScreen(){

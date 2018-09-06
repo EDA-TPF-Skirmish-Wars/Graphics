@@ -38,7 +38,9 @@ protected:
     std::vector<MartusTerrains> terrainList;
 private:
     void showLine(unsigned int i);
-    void drawElement(ELEMENTO);
+    void Graphics::drawTerrain(MartusTerrains terrainToDraw);
+    void Graphics::drawBuilding(MartusBuildings buildingToDraw);
+    void Graphics::drawUnit(MartusUnidades unitToDraw);
     ALLEGRO_DISPLAY * display = NULL;
 };
 

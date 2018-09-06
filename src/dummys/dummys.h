@@ -1,10 +1,12 @@
+#ifndef DUMMYS_H
+#define DUMMYS_H
 #include <iostream>
 
 using namespace std;
 
-typedef enum{UNIDAD1,UNIDAD2,UNIDAD3,UNIDAD4,UNIDAD5,UNIDAD6,UNIDAD7}units_d;
-typedef enum{TERRENO1,TERRENO2,TERRENO3,TERRENO4,TERRENO5,TERRENO6}terrains_d;
-typedef enum{EDIFICIO1,EDIFICIO2,EDIFICIO3,EDIFICIO4,EDIFICIO5}buildings_d;
+typedef enum{UNIDAD_1,UNIDAD_2,UNIDAD_3,UNIDAD_4,UNIDAD_5,UNIDAD_6,UNIDAD_7}units_d;
+typedef enum{TERRENO_1,TERRENO_2,TERRENO_3,TERRENO_4,TERRENO_5,TERRENO_6}terrains_d;
+typedef enum{EDIFICIO_1,EDIFICIO_2,EDIFICIO_3,EDIFICIO_4,EDIFICIO_5}buildings_d;
 
 typedef struct{
     unsigned int x;
@@ -43,3 +45,5 @@ protected:
 private:
     buildings_d typeOfBuilding;
 };
+
+#endif
