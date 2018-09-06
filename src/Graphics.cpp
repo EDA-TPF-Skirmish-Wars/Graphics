@@ -1,13 +1,24 @@
 #include "./Graphics.h"
+#define DISPLAY_WIDTH   800
+#define DISPLAY_HEIGHT  600
+#define TILE_SIDE   50
+
+#ifdef __linux__
+    #include <allegro5/allegro_image.h>
+#elif _WIN32
+    #include <allegro5/allegro_image>
+#endif
 
 
 Graphics::Graphics(std::vector<MartusTerrains> newTerrainList, 
                     std::vector<MartusUnidades> newUnitList, 
                     std::vector<MartusBuildings> newBuildingList){
+    error = G_NO_ERROR;
     this->terrainList = newTerrainList;
     this->unitList = newUnitList;
     this->buildingList = newBuildingList;
-    this->display = al_create_display(500,500);
+    al_init_image_addon();
+    this->display = al_create_display(DISPLAY_WIDTH,DISPLAY_HEIGHT);
     return;
 }
 
@@ -17,24 +28,25 @@ Graphics::~Graphics(){
     return;
 }
 
-void Graphics::updateGraphics(std::vector<MartusUnidades> unitList,
+errors_s Graphics::updateGraphics(std::vector<MartusUnidades> unitList,
                                 std::vector<MartusBuildings> buildingList){
-    this->unitList = unitList;;
+    this->unitList = unitList;
     this->buildingList = buildingList;
+    errors_s error = G_NO_ERROR;
     for(unsigned int u = 0 ; u < 12; u++){
         for(unsigned int i = 0 ; i < 16 ; i++){
-            showLine(u);
+            error = showLine(u);
         }
     }
-    return;
+    return error;
 }
 
-void Graphics::showLine(unsigned int line){
+errors_s Graphics::showLine(unsigned int line){
     //Dibuja los elementos que se encuentran en la linea i del mapa, las lineas van de 0-11 y las columnas de 0-15
     std::vector<MartusTerrains> terrainsInLine;
     std::vector<MartusBuildings> buildingsInLine;
     std::vector<MartusUnidades> unitsInLine;
-    
+    errors_s error;
 
     for(unsigned int j=line*16 ; j < (line+1)*16 ; j++){
         if(this->terrainList[j].getPosition().x == line)
@@ -51,35 +63,59 @@ void Graphics::showLine(unsigned int line){
 
     //tengo cargado en las listas los elementos de la fila correspodiente
     for(unsigned int o = 0; o <= terrainsInLine.size(); o++){
-        this->drawTerrain(terrainsInLine[o]);
+        error = this->drawTerrain(terrainsInLine[o]);
     }
     for(unsigned int o = 0; o <= buildingsInLine.size(); o++){
-        this->drawBuilding(buildingsInLine[o]);
+        error = this->drawBuilding(buildingsInLine[o]);
     }
     for(unsigned int o = 0; o <= unitsInLine.size(); o++){
-        this->drawUnit(unitsInLine[o]);
+        error = this->drawUnit(unitsInLine[o]);
     }
-    
-    al_flip_display();
-    return;
+    if(error == G_NO_ERROR)
+        al_flip_display();
+    return error;
 }
 
-void Graphics::drawTerrain(MartusTerrains terrainToDraw){
-    return;
+errors_s Graphics::drawTerrain(MartusTerrains terrainToDraw){
+    ALLEGRO_BITMAP * bmp = al_load_bitmap(terrainToDraw.getImagePath().c_str());
+    errors_s error = G_NO_ERROR;
+    if(bmp != NULL){
+        al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE,
+                         terrainToDraw.getPosition().y * TILE_SIDE , 0);
+        al_destroy_bitmap(bmp);
+    }
+    else
+        error = G_LOAD_BITMAP_ERROR;
+    return error;
 }
 
-void Graphics::drawBuilding(MartusBuildings buildingToDraw){
-    return;
+errors_s Graphics::drawBuilding(MartusBuildings buildingToDraw){
+    ALLEGRO_BITMAP * bmp = al_load_bitmap(buildingToDraw.getImagePath().c_str());
+    errors_s error = G_NO_ERROR;
+    if(bmp != NULL){
+        al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE,
+                         buildingToDraw.getPosition().y * TILE_SIDE , 0);
+        al_destroy_bitmap(bmp);
+    }
+    else
+        error = G_LOAD_BITMAP_ERROR;
+    return error;
 }
 
-void Graphics::drawUnit(MartusUnidades unitToDraw){
-    return;
+errors_s Graphics::drawUnit(MartusUnidades unitToDraw){
+    ALLEGRO_BITMAP * bmp = al_load_bitmap(unitToDraw.getImagePath().c_str());
+    errors_s error = G_NO_ERROR;
+    if(bmp != NULL){
+        al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE,
+                         unitToDraw.getPosition().y * TILE_SIDE , 0);
+        al_destroy_bitmap(bmp);
+    }
+    else
+        error = G_LOAD_BITMAP_ERROR;
+
+    return error;
 }
 
 ACTION Graphics::getUserAction(){
     return hola1;
-}
-
-void Graphics::showOnScreen(){
-    return;
 }

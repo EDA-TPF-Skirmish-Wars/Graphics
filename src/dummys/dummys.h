@@ -1,6 +1,7 @@
 #ifndef DUMMYS_H
 #define DUMMYS_H
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -18,8 +19,10 @@ class MartusUnidades
 public:
     position_s getPosition();
     units_d getTypeOfUnit();
+    string getImagePath();
 protected:
     position_s position;
+    string imagePath;
 private:
     units_d typeOfUnit;
 };
@@ -29,8 +32,10 @@ class MartusTerrains
 public:
     position_s getPosition();
     terrains_d getTypeOfTerrain();
+    string getImagePath();
 protected:
     position_s position;
+    string imagePath;
 private:
     terrains_d typeOfTerrain;
 };
@@ -40,8 +45,10 @@ class MartusBuildings
 public:
     position_s getPosition();
     buildings_d getTypeOfBuilding();
+    string getImagePath();
 protected:
     position_s position;
+    string imagePath;
 private:
     buildings_d typeOfBuilding;
 };
