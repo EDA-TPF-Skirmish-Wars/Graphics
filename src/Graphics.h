@@ -7,7 +7,7 @@
 #define GRAPHICS_H
 
 #define DEBUG
-//#define FOW
+#define FOW
 
 #include <iostream>
 #include <vector>
@@ -24,7 +24,12 @@
     #include <allegro5/allegro>
 #endif
 
-typedef enum {hola,hola1,hola2}ACTION;
+typedef struct{
+    act_s act;
+    position_s positionFrom;
+    position_s positionTo;
+}action_s;
+typedef enum {A_NO_ACTION, A_CLOSE_GAME}act_s;
 typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR}errors_s;
 
 
@@ -40,7 +45,7 @@ public:
     //introduction(); //poner algun presentacion al juego para hacerlo mas copado
     errors_s updateGraphics(std::vector<MartusUnidades> unitList,
                             std::vector<MartusBuildings> buildingList);
-    ACTION getUserAction();
+    action_s getUserAction();
 protected:
     std::vector<MartusUnidades> unitList;
     std::vector<MartusBuildings> buildingList;
@@ -54,6 +59,8 @@ private:
     errors_s loadGraphics();
     ALLEGRO_DISPLAY * display = NULL;
     ALLEGRO_EVENT_QUEUE * evQueue = NULL;
+    action_s getMouseAction(ALLEGRO_EVENT ev);
+    action_s getKeyboardAction(ALLEGRO_EVENT ev);
 };
 
 #endif

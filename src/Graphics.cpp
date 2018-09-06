@@ -138,10 +138,30 @@ errors_s Graphics::drawUnit(MartusUnidades unitToDraw){
     return error;
 }
 
-ACTION Graphics::getUserAction(){
+action_s Graphics::getUserAction(){
+    ALLEGRO_EVENT ev;
+    action_s action;
+    action.act = A_NO_ACTION;
     if(!al_is_event_queue_empty(this->evQueue)){
+        while(al_get_next_event(this->evQueue,&ev) || action.act == A_NO_ACTION){
+            switch(ev.type){
+                case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                    al_destroy_display(this->display);
+                    al_destroy_event_queue(this->evQueue);
+                    action.act = A_CLOSE_GAME;
+                    break;
+                case ALLEGRO_EVENT_KEY_DOWN:
+                    action = getKeyboardAction(ev);
+                    break;
+                case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+                    action = getMouseAction(ev);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
-    return hola1;
+    return action;
 }
 
 void Graphics::setTeam(int team){
