@@ -23,16 +23,19 @@ typedef enum {CHAU,CHAU1,CHAU2}ELEMENTO;
 class Graphics
 {
 public:
-    Graphics(std::vector<terrains_d> newTerrainList, std::vector<units_d> newUnitList, std::vector<buildings_d> newBuildingList);
+    Graphics(std::vector<MartusTerrains> newTerrainList, 
+                    std::vector<MartusUnidades> newUnitList, 
+                    std::vector<MartusBuildings> newBuildingList);
     ~Graphics();
     //introduction(); //poner algun presentacion al juego para hacerlo mas copado
-    void updateGraphics(std::vector<units_d> unitList,std::vector<buildings_d> buildingList);
+    void updateGraphics(std::vector<MartusUnidades> unitList,
+                         std::vector<MartusBuildings> buildingList);
     ACTION getUserAction();
     void showOnScreen();
 protected:
-    std::vector<units_d> unitList;
-    std::vector<buildings_d> buildingList;
-    std::vector<terrains_d> terrainList;
+    std::vector<MartusUnidades> unitList;
+    std::vector<MartusBuildings> buildingList;
+    std::vector<MartusTerrains> terrainList;
 private:
     void showLine(unsigned int i);
     void drawElement(ELEMENTO);

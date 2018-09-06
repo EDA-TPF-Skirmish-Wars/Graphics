@@ -1,7 +1,9 @@
 #include "./Graphics.h"
 
 
-Graphics::Graphics(std::vector<terrains_d> newTerrainList, std::vector<units_d> newUnitList, std::vector<buildings_d> newBuildingList){
+Graphics::Graphics(std::vector<MartusTerrains> newTerrainList, 
+                    std::vector<MartusUnidades> newUnitList, 
+                    std::vector<MartusBuildings> newBuildingList){
     this->terrainList = newTerrainList;
     this->unitList = newUnitList;
     this->buildingList = newBuildingList;
@@ -15,7 +17,8 @@ Graphics::~Graphics(){
     return;
 }
 
-void Graphics::updateGraphics(std::vector<units_d> unitList,std::vector<buildings_d> buildingList){
+void Graphics::updateGraphics(std::vector<MartusUnidades> unitList,
+                                std::vector<MartusBuildings> buildingList){
     this->unitList = unitList;;
     this->buildingList = buildingList;
     for(unsigned int u = 0 ; u < 12; u++){
@@ -28,20 +31,21 @@ void Graphics::updateGraphics(std::vector<units_d> unitList,std::vector<building
 
 void Graphics::showLine(unsigned int line){
     //Dibuja los elementos que se encuentran en la linea i del mapa, las lineas van de 0-11 y las columnas de 0-15
-    std::vector<terrains_d> terrainsInLine;
-    std::vector<buildings_d> buildingsInLine;
-    std::vector<units_d> unitsInLine;
+    std::vector<MartusTerrains> terrainsInLine;
+    std::vector<MartusBuildings> buildingsInLine;
+    std::vector<MartusUnidades> unitsInLine;
+    
 
     for(unsigned int j=line*16 ; j < (line+1)*16 ; j++){
         if(this->terrainList[j].getPosition().x == line)
             terrainsInLine.push_back(this->terrainList[j]);
     }
     for(unsigned int j=0 ; j <= this->buildingList.size() ; j++){
-        if(this->buildingList[j]->getPosition().x == line)
+        if(this->buildingList[j].getPosition().x == line)
             buildingsInLine.push_back(this->buildingList[j]);
     }
     for(unsigned int j=0 ; j <= this->unitList.size() ; j++){
-        if(this->unitList[j]->getPosition().x == line)
+        if(this->unitList[j].getPosition().x == line)
             unitsInLine.push_back(this->unitList[j]);
     }
 
