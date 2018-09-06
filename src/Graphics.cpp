@@ -77,45 +77,68 @@ errors_s Graphics::showLine(unsigned int line){
 }
 
 errors_s Graphics::drawTerrain(MartusTerrains terrainToDraw){
-    ALLEGRO_BITMAP * bmp = al_load_bitmap(terrainToDraw.getImagePath().c_str());
     errors_s error = G_NO_ERROR;
-    if(bmp != NULL){
-        al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE,
-                         terrainToDraw.getPosition().y * TILE_SIDE , 0);
-        al_destroy_bitmap(bmp);
+#ifdef FOW
+    if(terrainToDraw.getFog() == false){
+#endif
+        ALLEGRO_BITMAP * bmp = al_load_bitmap(terrainToDraw.getImagePath().c_str());
+        if(bmp != NULL){
+            al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE,
+                            terrainToDraw.getPosition().y * TILE_SIDE , 0);
+            al_destroy_bitmap(bmp);
+        }
+        else
+            error = G_LOAD_BITMAP_ERROR;
+#ifdef FOW
     }
-    else
-        error = G_LOAD_BITMAP_ERROR;
+#endif
     return error;
 }
 
 errors_s Graphics::drawBuilding(MartusBuildings buildingToDraw){
-    ALLEGRO_BITMAP * bmp = al_load_bitmap(buildingToDraw.getImagePath().c_str());
     errors_s error = G_NO_ERROR;
-    if(bmp != NULL){
-        al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE,
-                         buildingToDraw.getPosition().y * TILE_SIDE , 0);
-        al_destroy_bitmap(bmp);
+#ifdef FOW
+    if(buildingToDraw.getFog() == false){
+#endif
+        ALLEGRO_BITMAP * bmp = al_load_bitmap(buildingToDraw.getImagePath().c_str());
+        if(bmp != NULL){
+            al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE,
+                            buildingToDraw.getPosition().y * TILE_SIDE , 0);
+            al_destroy_bitmap(bmp);
+        }
+        else
+            error = G_LOAD_BITMAP_ERROR;
+#ifdef FOW
     }
-    else
-        error = G_LOAD_BITMAP_ERROR;
+#endif
     return error;
 }
 
 errors_s Graphics::drawUnit(MartusUnidades unitToDraw){
-    ALLEGRO_BITMAP * bmp = al_load_bitmap(unitToDraw.getImagePath().c_str());
     errors_s error = G_NO_ERROR;
-    if(bmp != NULL){
-        al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE,
-                         unitToDraw.getPosition().y * TILE_SIDE , 0);
-        al_destroy_bitmap(bmp);
+#ifdef FOW
+    if(unitToDraw.getFog() == false){
+#endif
+        ALLEGRO_BITMAP * bmp = al_load_bitmap(unitToDraw.getImagePath().c_str());
+        
+        if(bmp != NULL){
+            al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE,
+                            unitToDraw.getPosition().y * TILE_SIDE , 0);
+            al_destroy_bitmap(bmp);
+        }
+        else
+            error = G_LOAD_BITMAP_ERROR;
+#ifdef FOW
     }
-    else
-        error = G_LOAD_BITMAP_ERROR;
-
+#endif
     return error;
 }
 
 ACTION Graphics::getUserAction(){
     return hola1;
+}
+
+void Graphics::setTeam(int team){
+    this->team = team;
+    return;
 }

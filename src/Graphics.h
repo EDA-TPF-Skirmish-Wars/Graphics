@@ -7,9 +7,12 @@
 #define GRAPHICS_H
 
 #define DEBUG
+//#define FOW
 
 #include <iostream>
 #include <vector>
+#define TEAM1   0
+#define TEAM2   1
 
 #ifdef  DEBUG
     #include "./dummys/dummys.h"
@@ -26,6 +29,7 @@ typedef enum {CHAU,CHAU1,CHAU2}ELEMENTO;
 typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR}errors_s;
 
 
+
 class Graphics
 {
 public:
@@ -33,6 +37,7 @@ public:
                 std::vector<MartusUnidades> newUnitList, 
                 std::vector<MartusBuildings> newBuildingList);
     ~Graphics();
+    void setTeam(int team); //TEAM0 o TEAM1
     //introduction(); //poner algun presentacion al juego para hacerlo mas copado
     errors_s updateGraphics(std::vector<MartusUnidades> unitList,
                             std::vector<MartusBuildings> buildingList);
@@ -41,6 +46,7 @@ protected:
     std::vector<MartusUnidades> unitList;
     std::vector<MartusBuildings> buildingList;
     std::vector<MartusTerrains> terrainList;
+    int team;
 private:
     errors_s showLine(unsigned int i);
     errors_s drawTerrain(MartusTerrains terrainToDraw);

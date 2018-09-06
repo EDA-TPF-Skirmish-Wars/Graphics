@@ -20,9 +20,13 @@ public:
     position_s getPosition();
     units_d getTypeOfUnit();
     string getImagePath();
+    int getTeam();
+    bool getFog();
 protected:
     position_s position;
     string imagePath;
+    int team;
+    bool fog;
 private:
     units_d typeOfUnit;
 };
@@ -33,9 +37,13 @@ public:
     position_s getPosition();
     terrains_d getTypeOfTerrain();
     string getImagePath();
+    int getTeam();
+    bool getFog();
 protected:
     position_s position;
     string imagePath;
+    int team;
+    bool fog;
 private:
     terrains_d typeOfTerrain;
 };
@@ -46,9 +54,13 @@ public:
     position_s getPosition();
     buildings_d getTypeOfBuilding();
     string getImagePath();
+    int getTeam();
+    bool getFog();
 protected:
     position_s position;
     string imagePath;
+    int team;
+    bool fog;
 private:
     buildings_d typeOfBuilding;
 };
