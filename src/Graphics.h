@@ -1,6 +1,6 @@
 #include <iostream>
 #include "./dummys/dummys.h"
-#include <allegro5/allegro>
+#include <allegro5/allegro.h>
 
 
 class Graphics

@@ -1,5 +1,5 @@
 #include "./Graphics.h"
-#include <allegro5/allegro>
+#include <allegro5/allegro.h>
 
 using namespace std;
 

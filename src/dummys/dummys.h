@@ -6,7 +6,7 @@ typedef enum{UNIDAD1,UNIDAD2,UNIDAD3,UNIDAD4,UNIDAD5,UNIDAD6,UNIDAD7}units_d;
 typedef enum{TERRENO1,TERRENO2,TERRENO3,TERRENO4,TERRENO5,TERRENO6}terrains_d;
 typedef enum{EDIFICIO1,EDIFICIO2,EDIFICIO3,EDIFICIO4,EDIFICIO5}buildings_d;
 
-struct{
+typedef struct{
     unsigned int x;
     unsigned int y;
 }position_s;
