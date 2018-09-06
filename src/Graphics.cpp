@@ -1,6 +1,7 @@
 #include "./Graphics.h"
 
-Graphics::Graphics(std::list<terrains_d> newTerrainList, std::list<units_d> newUnitList, std::list<buildings_d> newBuildingList){
+
+Graphics::Graphics(std::vector<terrains_d> newTerrainList, std::vector<units_d> newUnitList, std::vector<buildings_d> newBuildingList){
     this->terrainList = newTerrainList;
     this->unitList = newUnitList;
     this->buildingList = newBuildingList;
@@ -14,7 +15,7 @@ Graphics::~Graphics(){
     return;
 }
 
-void Graphics::updateGraphics(unitList,buildingList){
+void Graphics::updateGraphics(std::vector<units_d> unitList,std::vector<buildings_d> buildingList){
     this->unitList = unitList;;
     this->buildingList = buildingList;
     for(unsigned int u = 0 ; u < 12; u++){
@@ -27,40 +28,42 @@ void Graphics::updateGraphics(unitList,buildingList){
 
 void Graphics::showLine(unsigned int line){
     //Dibuja los elementos que se encuentran en la linea i del mapa, las lineas van de 0-11 y las columnas de 0-15
-    list<terrains_d> terrainsInLine;
-    list<buildings_d> buildingsInLine;
-    list<units_d> unitsInLine;
+    std::vector<terrains_d> terrainsInLine;
+    std::vector<buildings_d> buildingsInLine;
+    std::vector<units_d> unitsInLine;
+
     for(unsigned int j=line*16 ; j < (line+1)*16 ; j++){
         if(this->terrainList[j].getPosition().x == line)
             terrainsInLine.push_back(this->terrainList[j]);
     }
     for(unsigned int j=0 ; j <= this->buildingList.size() ; j++){
-        if(this->buildingList[j].getPosition().x == line)
+        if(this->buildingList[j]->getPosition().x == line)
             buildingsInLine.push_back(this->buildingList[j]);
     }
     for(unsigned int j=0 ; j <= this->unitList.size() ; j++){
-        if(this->unitList[j].getPosition().x == line)
+        if(this->unitList[j]->getPosition().x == line)
             unitsInLine.push_back(this->unitList[j]);
     }
+
     //tengo cargado en las listas los elementos de la fila correspodiente
     for(unsigned int o = 0; o <= terrainsInLine.size(); o++){
-        drawElement(terrainsInLine[o],line);
+        //drawElement(terrainsInLine[o],line);
     }
     for(unsigned int o = 0; o <= buildingsInLine.size(); o++){
-        drawElement(buildingsInLine[o],line);
+        //drawElement(buildingsInLine[o],line);
     }
     for(unsigned int o = 0; o <= terrainsInLine.size(); o++){
-        drawElement(buildingsInLine[o],line);
+        //drawElement(buildingsInLine[o],line);
     }
     return;
 }
 
-void Graphics::drawElement(){
+void Graphics::drawElement(ELEMENTO){
     return;
 }
 
 
-ACTION Graphics::getUSerAction(){
+ACTION Graphics::getUserAction(){
     return;
 }
 

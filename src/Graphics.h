@@ -4,7 +4,7 @@
 #define DEBUG
 
 #include <iostream>
-#include <list>
+#include <vector>
 
 #ifdef  DEBUG
     #include "./dummys/dummys.h"
@@ -23,16 +23,16 @@ typedef enum {CHAU,CHAU1,CHAU2}ELEMENTO;
 class Graphics
 {
 public:
-    Graphics(std::list<terrains_d> newTerrainList, std::list<units_d> newUnitList, std::list<buildings_d> newBuildingList);
+    Graphics(std::vector<terrains_d> newTerrainList, std::vector<units_d> newUnitList, std::vector<buildings_d> newBuildingList);
     ~Graphics();
     //introduction(); //poner algun presentacion al juego para hacerlo mas copado
-    void updateGraphics(std::list<units_d> unitList,std::list<buildings_d> buildingList);
+    void updateGraphics(std::vector<units_d> unitList,std::vector<buildings_d> buildingList);
     ACTION getUserAction();
     void showOnScreen();
 protected:
-    std::list<units_d> unitList;
-    std::list<buildings_d> buildingList;
-    std::list<terrains_d> terrainList;
+    std::vector<units_d> unitList;
+    std::vector<buildings_d> buildingList;
+    std::vector<terrains_d> terrainList;
 private:
     void showLine(unsigned int i);
     void drawElement(ELEMENTO);
