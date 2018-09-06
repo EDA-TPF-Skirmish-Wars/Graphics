@@ -13,12 +13,16 @@
 Graphics::Graphics(std::vector<MartusTerrains> newTerrainList, 
                     std::vector<MartusUnidades> newUnitList, 
                     std::vector<MartusBuildings> newBuildingList){
-    error = G_NO_ERROR;
     this->terrainList = newTerrainList;
     this->unitList = newUnitList;
     this->buildingList = newBuildingList;
     al_init_image_addon();
+    this->evQueue = al_create_event_queue();
+    al_register_event_source(this->evQueue,al_get_keyboard_event_source());
+    al_register_event_source(this->evQueue,al_get_mouse_event_source());
     this->display = al_create_display(DISPLAY_WIDTH,DISPLAY_HEIGHT);
+    al_register_event_source(this->evQueue,al_get_display_event_source(this->display));
+
     return;
 }
 
@@ -135,6 +139,8 @@ errors_s Graphics::drawUnit(MartusUnidades unitToDraw){
 }
 
 ACTION Graphics::getUserAction(){
+    if(!al_is_event_queue_empty(this->evQueue)){
+    }
     return hola1;
 }
 

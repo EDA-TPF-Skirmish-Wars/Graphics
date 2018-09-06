@@ -25,7 +25,6 @@
 #endif
 
 typedef enum {hola,hola1,hola2}ACTION;
-typedef enum {CHAU,CHAU1,CHAU2}ELEMENTO;
 typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR}errors_s;
 
 
@@ -54,8 +53,7 @@ private:
     errors_s drawUnit(MartusUnidades unitToDraw);
     errors_s loadGraphics();
     ALLEGRO_DISPLAY * display = NULL;
-    errors_s loadBitmaps();
-    errors_s error;
+    ALLEGRO_EVENT_QUEUE * evQueue = NULL;
 };
 
 #endif
