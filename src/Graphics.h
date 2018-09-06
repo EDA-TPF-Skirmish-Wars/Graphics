@@ -1,6 +1,23 @@
+#ifndef GRAPHICS_H
+#define GRAPHICS_H
+
+#define DEBUG
+
 #include <iostream>
-#include "./dummys/dummys.h"
-#include <allegro5/allegro.h>
+#include <list>
+
+#ifdef  DEBUG
+    #include "./dummys/dummys.h"
+#endif
+
+#ifdef __linux__
+    #include <allegro5/allegro.h>
+#elif _WIN32
+    #include <allegro5/allegro>
+#endif
+
+typedef enum {hola,hola1,hola2}ACTION;
+typedef enum {CHAU,CHAU1,CHAU2}ELEMENTO;
 
 
 class Graphics
@@ -21,3 +38,5 @@ private:
     void drawElement(ELEMENTO);
     ALLEGRO_DISPLAY * display = NULL;
 };
+
+#endif

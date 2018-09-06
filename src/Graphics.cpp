@@ -1,14 +1,11 @@
 #include "./Graphics.h"
-#include <allegro5/allegro.h>
 
-using namespace std;
-
-Graphics:::Graphics(newTerrainList,newUnitList,newBuildingList){
-    this-terrainList = newTerrainList;
+Graphics::Graphics(std::list<terrains_d> newTerrainList, std::list<units_d> newUnitList, std::list<buildings_d> newBuildingList){
+    this->terrainList = newTerrainList;
     this->unitList = newUnitList;
     this->buildingList = newBuildingList;
-    al_init_display(this->display);
-    return
+    this->display = al_create_display(500,500);
+    return;
 }
 
 Graphics::~Graphics(){
