@@ -22,6 +22,7 @@ public:
     string getImagePath();
     int getTeam();
     bool getFog();
+    void setFogOn();
 protected:
     position_s position;
     string imagePath;
@@ -39,6 +40,7 @@ public:
     string getImagePath();
     int getTeam();
     bool getFog();
+    void setFogOn();
 protected:
     position_s position;
     string imagePath;
@@ -56,6 +58,7 @@ public:
     string getImagePath();
     int getTeam();
     bool getFog();
+    void setFogOn();
 protected:
     position_s position;
     string imagePath;
@@ -63,6 +66,22 @@ protected:
     bool fog;
 private:
     buildings_d typeOfBuilding;
+};
+
+class MartusMap
+{
+public:
+    void updateFog();
+    std::vector<MartusBuildings> getBuildings();
+    std::vector<MartusTerrains> getTerrains();
+    std::vector<MartusUnidades> getUnits();
+    bool isThereAUnitThere(int x, int y);
+    bool isThereABuildingThere(int x, int y);
+protected:
+    std::vector<MartusBuildings> buildings;
+    std::vector<MartusTerrains> terrains;
+    std::vector<MartusUnidades> units;
+private:
 };
 
 #endif

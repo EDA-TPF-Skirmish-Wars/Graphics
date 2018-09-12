@@ -1,7 +1,10 @@
 #include "./Graphics.h"
 #define DISPLAY_WIDTH   800
 #define DISPLAY_HEIGHT  600
+#define DISPLAY_WIDTH_OFFSET    0
+#define DISPLAY_HEIGHT_OFFSET    0
 #define TILE_SIDE   50
+#define LEFT_CLICK  1
 
 #ifdef __linux__
     #include <allegro5/allegro_image.h>
@@ -70,7 +73,7 @@ errors_s Graphics::showLine(unsigned int line){
             unitsInLine.push_back(this->unitList[j]);
     }
 
-    this->showTransition(this->decodeMovements());
+    //this->showTransition(this->decodeMovements());
     //FALTA HACER LA TRANSICION ENTRE MOVIMIENTOS PARA QUE EL JUEGO SE VEA MAS FLUIDO
     //tengo cargado en las listas los elementos de la fila correspodiente
     //dibujo cada elemento en su correspondiente lugar
@@ -95,8 +98,8 @@ errors_s Graphics::drawTerrain(MartusTerrains terrainToDraw){
 #endif
         ALLEGRO_BITMAP * bmp = al_load_bitmap(terrainToDraw.getImagePath().c_str());
         if(bmp != NULL){
-            al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE,
-                            terrainToDraw.getPosition().y * TILE_SIDE , 0);
+            al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+                            terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
             al_destroy_bitmap(bmp);
         }
         else
@@ -114,8 +117,8 @@ errors_s Graphics::drawBuilding(MartusBuildings buildingToDraw){
 #endif
         ALLEGRO_BITMAP * bmp = al_load_bitmap(buildingToDraw.getImagePath().c_str());
         if(bmp != NULL){
-            al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE,
-                            buildingToDraw.getPosition().y * TILE_SIDE , 0);
+            al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE +DISPLAY_WIDTH_OFFSET,
+                            buildingToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
             al_destroy_bitmap(bmp);
         }
         else
@@ -134,8 +137,8 @@ errors_s Graphics::drawUnit(MartusUnidades unitToDraw){
         ALLEGRO_BITMAP * bmp = al_load_bitmap(unitToDraw.getImagePath().c_str());
         
         if(bmp != NULL){
-            al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE,
-                            unitToDraw.getPosition().y * TILE_SIDE , 0);
+            al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+                            unitToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
             al_destroy_bitmap(bmp);
         }
         else
@@ -180,4 +183,29 @@ action_s Graphics::getUserAction(bool (* isTheActionValid)(action_s)){
 void Graphics::setTeam(int team){
     this->team = team;
     return;
+}
+
+std::vector<movement_s> Graphics::decodeMovements(){ //FINISH LATER
+    std::vector<movement_s> movements;
+    std::vector<unsigned int> temp;
+    for(unsigned int i = 0; i < min(this->unitList.size(),this->newUnitList.size()); i++){
+        if(!unitsAreEqual(unitList[i],newUnitList[i]));
+            temp.push_back(i);
+    }
+
+}
+
+action_s Graphics::getMouseAction(ALLEGRO_EVENT ev)
+{
+    int x = ev.mouse.x;
+    int y = ev.mouse.y;
+    x -= DISPLAY_WIDTH_OFFSET;
+    y -= DISPLAY_HEIGHT_OFFSET;
+    x /= TILE_SIDE;
+    y /= TILE_SIDE;
+    action_s temp;
+    temp.act = A_NO_ACTION;
+    if(ev.mouse.button != LEFT_CLICK)
+        return temp;
+    if()
 }

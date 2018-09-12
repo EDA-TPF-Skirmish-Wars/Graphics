@@ -2,6 +2,14 @@
 //              GRAPHICS.H                              //
 // ALLEGRO NECESITA ESTAR INICIALIZADO                  //
 //////////////////////////////////////////////////////////
+/*Definiciones:
+-   Las posiciones son discretas y estan horizontalmente de 0 a 15 y verticalmente de 0-11.
+    La posicion (0,0) se encuentra en la esquina superior izquierda del mapa y la posicion
+    (15,11) en la esquina inferior derecha.
+
+-   Las clases "terrenos", "edificios" y "unidades" deben tener, aparte de las que se necesite,
+    los metodos que poseen las clases de 'dummy.h'
+*/
 
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
@@ -29,7 +37,7 @@ typedef struct{
     position_s positionFrom;
     position_s positionTo;
 }action_s;
-typedef enum {A_NO_ACTION, A_CLOSE_GAME}act_s;
+typedef enum {A_NO_ACTION, A_ATTACK, A_MOVE , A_PURCHASE, A_PASS ,A_CLOSE_GAME}act_s;
 typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR}errors_s;
 
 typedef struct{
@@ -73,22 +81,26 @@ protected:
     std::vector<MartusUnidades> unitList;
     std::vector<MartusBuildings> buildingList;
     std::vector<MartusTerrains> terrainList;
+    MartusMap map;
     int team;
 private:
-    errors_s showLine(unsigned int i);
-    errors_s drawTerrain(MartusTerrains terrainToDraw);
-    errors_s drawBuilding(MartusBuildings buildingToDraw);
-    errors_s drawUnit(MartusUnidades unitToDraw);
-    errors_s loadGraphics();
-    std::vector<movement_s> decodeMovements();
-    errors_s showTransition(std::vector<movement_s> movements);
+    errors_s showLine(unsigned int i); //partially done
+    errors_s drawTerrain(MartusTerrains terrainToDraw);//partially done
+    errors_s drawBuilding(MartusBuildings buildingToDraw);//partially done
+    errors_s drawUnit(MartusUnidades unitToDraw);//partially done
+    errors_s loadGraphics();//partially done
+    std::vector<movement_s> decodeMovements();//not done
+    errors_s showTransition(std::vector<movement_s> movements);//not done
+    bool unitsAreEqual(MartusUnidades unit1, MartusUnidades unit2);//not done
+    action_s getMouseAction(ALLEGRO_EVENT ev);//not done
+    action_s getKeyboardAction(ALLEGRO_EVENT ev);//not done
+
+
     std::vector<MartusUnidades> newUnitList;
     std::vector<MartusBuildings> newBuildingList;
     std::vector<MartusTerrains> newTerrainList;
     ALLEGRO_DISPLAY * display = NULL;
     ALLEGRO_EVENT_QUEUE * evQueue = NULL;
-    action_s getMouseAction(ALLEGRO_EVENT ev);
-    action_s getKeyboardAction(ALLEGRO_EVENT ev);
 };
 
 #endif
