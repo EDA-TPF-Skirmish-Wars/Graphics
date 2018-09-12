@@ -32,6 +32,12 @@ typedef struct{
 typedef enum {A_NO_ACTION, A_CLOSE_GAME}act_s;
 typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR}errors_s;
 
+typedef struct{
+    position_s positionFrom;
+    position_s positionTo;
+    MartusUnidades unitType;
+}movement_s;
+
 
 
 class Graphics
@@ -40,12 +46,29 @@ public:
     Graphics(std::vector<MartusTerrains> newTerrainList, 
                 std::vector<MartusUnidades> newUnitList, 
                 std::vector<MartusBuildings> newBuildingList);
+/*Funcion de inicializacion de la clase, se le debe pasar 3 vectores uno con Terrenos, otro con unidades y
+el tercero con edificios.
+NO devuelve nada.
+*/
     ~Graphics();
-    void setTeam(int team); //TEAM0 o TEAM1
+    void setTeam(int team);
+/*Funcion de seteo del team del correspondiente jugador, se le debe pasar TEAM0 o TEAM1 como parametro y no devuelve nada.
+Sirve para ver el color de tus propias unidades.
+*/
     //introduction(); //poner algun presentacion al juego para hacerlo mas copado
+
     errors_s updateGraphics(std::vector<MartusUnidades> unitList,
                             std::vector<MartusBuildings> buildingList);
-    action_s getUserAction();
+/*  Esta funcion se la utiliza para actualizar los vectores de unidades y de edificios que fueron modificados por el
+jugador oponente. Se le pasa el nuevo vector de unidades, y el nuevo vector de edificios que actualiza el vector contenido
+dentro de esta clase. Y una vez actualizado grafica todas las lineas del mapa para que se vean en pantalla.
+Devuelve: un errors_s que estan especificados al principio de este archivo
+*/
+    action_s getUserAction(bool (* isTheActionValid)(action_s));
+/*Funcion encargada de obtener los movimientos que haga el usuario. Recibe como parametro un callback
+al que se le pasara una accion y respondera true si esa accion es valida, o false si no lo es.
+Devuelve: una action_s
+*/
 protected:
     std::vector<MartusUnidades> unitList;
     std::vector<MartusBuildings> buildingList;
@@ -57,6 +80,11 @@ private:
     errors_s drawBuilding(MartusBuildings buildingToDraw);
     errors_s drawUnit(MartusUnidades unitToDraw);
     errors_s loadGraphics();
+    std::vector<movement_s> decodeMovements();
+    errors_s showTransition(std::vector<movement_s> movements);
+    std::vector<MartusUnidades> newUnitList;
+    std::vector<MartusBuildings> newBuildingList;
+    std::vector<MartusTerrains> newTerrainList;
     ALLEGRO_DISPLAY * display = NULL;
     ALLEGRO_EVENT_QUEUE * evQueue = NULL;
     action_s getMouseAction(ALLEGRO_EVENT ev);

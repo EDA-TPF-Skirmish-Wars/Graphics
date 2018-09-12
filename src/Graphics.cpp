@@ -32,26 +32,31 @@ Graphics::~Graphics(){
     return;
 }
 
-errors_s Graphics::updateGraphics(std::vector<MartusUnidades> unitList,
-                                std::vector<MartusBuildings> buildingList){
-    this->unitList = unitList;
-    this->buildingList = buildingList;
+errors_s Graphics::updateGraphics(std::vector<MartusUnidades> newUnitList,
+                                std::vector<MartusBuildings> newBuildingList){
+    this->newUnitList = newUnitList;
+    this->newBuildingList = newBuildingList;
     errors_s error = G_NO_ERROR;
     for(unsigned int u = 0 ; u < 12; u++){
         for(unsigned int i = 0 ; i < 16 ; i++){
             error = showLine(u);
         }
     }
+    //Update class variables, and freeing memory
+    this->newUnitList.clear();
+    this->newBuildingList.clear();
+    this->unitList = newUnitList;
+    this->buildingList = newBuildingList;
     return error;
 }
 
 errors_s Graphics::showLine(unsigned int line){
     //Dibuja los elementos que se encuentran en la linea i del mapa, las lineas van de 0-11 y las columnas de 0-15
-    std::vector<MartusTerrains> terrainsInLine;
+    std::vector<MartusTerrains> terrainsInLine;     //Creo vectores con los los elementos de la linea a dibujar
     std::vector<MartusBuildings> buildingsInLine;
     std::vector<MartusUnidades> unitsInLine;
     errors_s error;
-
+    //Cargo los elementos encontrados en la linea en cada vector
     for(unsigned int j=line*16 ; j < (line+1)*16 ; j++){
         if(this->terrainList[j].getPosition().x == line)
             terrainsInLine.push_back(this->terrainList[j]);
@@ -65,7 +70,10 @@ errors_s Graphics::showLine(unsigned int line){
             unitsInLine.push_back(this->unitList[j]);
     }
 
+    this->showTransition(this->decodeMovements());
+    //FALTA HACER LA TRANSICION ENTRE MOVIMIENTOS PARA QUE EL JUEGO SE VEA MAS FLUIDO
     //tengo cargado en las listas los elementos de la fila correspodiente
+    //dibujo cada elemento en su correspondiente lugar
     for(unsigned int o = 0; o <= terrainsInLine.size(); o++){
         error = this->drawTerrain(terrainsInLine[o]);
     }
@@ -138,10 +146,11 @@ errors_s Graphics::drawUnit(MartusUnidades unitToDraw){
     return error;
 }
 
-action_s Graphics::getUserAction(){
+action_s Graphics::getUserAction(bool (* isTheActionValid)(action_s)){
     ALLEGRO_EVENT ev;
     action_s action;
     action.act = A_NO_ACTION;
+    bool validity = false;
     if(!al_is_event_queue_empty(this->evQueue)){
         while(al_get_next_event(this->evQueue,&ev) || action.act == A_NO_ACTION){
             switch(ev.type){
@@ -152,15 +161,19 @@ action_s Graphics::getUserAction(){
                     break;
                 case ALLEGRO_EVENT_KEY_DOWN:
                     action = getKeyboardAction(ev);
+                    validity = isTheActionValid(action);
                     break;
                 case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
                     action = getMouseAction(ev);
+                    validity = isTheActionValid(action);
                     break;
                 default:
                     break;
             }
         }
     }
+    if(!validity)
+        //DISPLAY ACTION NOT VALID DIALOG
     return action;
 }
 
