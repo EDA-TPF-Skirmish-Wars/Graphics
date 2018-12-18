@@ -37,7 +37,9 @@ typedef struct{
     position_s positionFrom;
     position_s positionTo;
 }action_s;
+
 typedef enum {A_NO_ACTION, A_ATTACK, A_MOVE , A_PURCHASE, A_PASS ,A_CLOSE_GAME}act_s;
+
 typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR}errors_s;
 
 typedef struct{
@@ -88,12 +90,13 @@ private:
     errors_s drawTerrain(MartusTerrains terrainToDraw);//partially done
     errors_s drawBuilding(MartusBuildings buildingToDraw);//partially done
     errors_s drawUnit(MartusUnidades unitToDraw);//partially done
-    errors_s loadGraphics();//partially done
+    errors_s loadGraphics();//not done
     std::vector<movement_s> decodeMovements();//not done
     errors_s showTransition(std::vector<movement_s> movements);//not done
     bool unitsAreEqual(MartusUnidades unit1, MartusUnidades unit2);//not done
     action_s getMouseAction(ALLEGRO_EVENT ev);//not done
     action_s getKeyboardAction(ALLEGRO_EVENT ev);//not done
+    void showPopUp(); //not done
 
 
     std::vector<MartusUnidades> newUnitList;
@@ -101,6 +104,7 @@ private:
     std::vector<MartusTerrains> newTerrainList;
     ALLEGRO_DISPLAY * display = NULL;
     ALLEGRO_EVENT_QUEUE * evQueue = NULL;
+    ALLEGRO_FONT *font;
 };
 
 #endif

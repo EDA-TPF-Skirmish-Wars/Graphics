@@ -5,11 +5,20 @@
 #define DISPLAY_HEIGHT_OFFSET    0
 #define TILE_SIDE   50
 #define LEFT_CLICK  1
+#define OPTIONS_MENU_AMOUNT  10
+
+#define WIDTH_POPUP     100
+#define POPUP_LINE      15  
+#define HEIGHT_POPUP    (POPUP_LINE * OPTIONS_MENU_AMOUNT)
 
 #ifdef __linux__
     #include <allegro5/allegro_image.h>
+    #include <allegro5/allegro_primitives.h>
+    #include <allegro5/allegro_font.h>
 #elif _WIN32
     #include <allegro5/allegro_image>
+    #include <allegro5/allegro_primitives>
+    #include <allegro5/allegro_font>
 #endif
 
 
@@ -25,7 +34,9 @@ Graphics::Graphics(std::vector<MartusTerrains> newTerrainList,
     al_register_event_source(this->evQueue,al_get_mouse_event_source());
     this->display = al_create_display(DISPLAY_WIDTH,DISPLAY_HEIGHT);
     al_register_event_source(this->evQueue,al_get_display_event_source(this->display));
-
+    al_init_primitives_addon();
+    al_init_font_addon();
+    font = al_load_font("resources/font.tga");
     return;
 }
 
@@ -43,6 +54,9 @@ errors_s Graphics::updateGraphics(std::vector<MartusUnidades> newUnitList,
     for(unsigned int u = 0 ; u < 12; u++){
         for(unsigned int i = 0 ; i < 16 ; i++){
             error = showLine(u);
+        }
+        if(error == G_NO_ERROR){
+            al_flip_display(display);
         }
     }
     //Update class variables, and freeing memory
@@ -77,6 +91,9 @@ errors_s Graphics::showLine(unsigned int line){
     //FALTA HACER LA TRANSICION ENTRE MOVIMIENTOS PARA QUE EL JUEGO SE VEA MAS FLUIDO
     //tengo cargado en las listas los elementos de la fila correspodiente
     //dibujo cada elemento en su correspondiente lugar
+
+    //CREO Q HABRIA QUE IMPRIMIR TODA LA PANTALLA EN NEGRO ANTES DE VOLVER A DIBUJAR
+
     for(unsigned int o = 0; o <= terrainsInLine.size(); o++){
         error = this->drawTerrain(terrainsInLine[o]);
     }
@@ -86,8 +103,8 @@ errors_s Graphics::showLine(unsigned int line){
     for(unsigned int o = 0; o <= unitsInLine.size(); o++){
         error = this->drawUnit(unitsInLine[o]);
     }
-    if(error == G_NO_ERROR)
-        al_flip_display();
+    //if(error == G_NO_ERROR)
+    //    al_flip_display();
     return error;
 }
 
@@ -154,6 +171,7 @@ action_s Graphics::getUserAction(bool (* isTheActionValid)(action_s)){
     action_s action;
     action.act = A_NO_ACTION;
     bool validity = false;
+    //IMPRIMIR UN "YOUR TURN" O ALGO SIMILAR ANTES
     if(!al_is_event_queue_empty(this->evQueue)){
         while(al_get_next_event(this->evQueue,&ev) || action.act == A_NO_ACTION){
             switch(ev.type){
@@ -195,8 +213,7 @@ std::vector<movement_s> Graphics::decodeMovements(){ //FINISH LATER
 
 }
 
-action_s Graphics::getMouseAction(ALLEGRO_EVENT ev)
-{
+action_s Graphics::getMouseAction(ALLEGRO_EVENT ev){
     int x = ev.mouse.x;
     int y = ev.mouse.y;
     x -= DISPLAY_WIDTH_OFFSET;
@@ -205,7 +222,58 @@ action_s Graphics::getMouseAction(ALLEGRO_EVENT ev)
     y /= TILE_SIDE;
     action_s temp;
     temp.act = A_NO_ACTION;
-    if(ev.mouse.button != LEFT_CLICK)
-        return temp;
-    if()
+    if(ev.mouse.button == LEFT_CLICK){
+        temp = showPopUp(map.getOptions(xTile, yTile));
+    }
+}
+
+action_s Graphics::showPopUp(options_s opt){
+    unsigned int amountOfLines = 0;
+    if(opt.attackUpAvailable)
+        amountOfLines++;
+    else if(opt.attackDownAvailable)
+        amountOfLines++;
+    else if(opt.attackRightAvailable)
+        amountOfLines++;
+    else if(opt.attackLeftAvailable)
+        amountOfLines++;
+    else if(opt.buyAvailable)
+        amountOfLines++;
+    else if(opt.moveAvailable)
+        amountOfLines++;
+    else if(opt.passAvailable)
+        amountOfLines++;
+    int x,y;
+    al_get_mouse_cursor_position(&x,&y);
+    al_draw_filled_rectangle(x,y,x+WIDTH_POPUP, y+(POPUP_LINE*amountOfLines),al_map_rgb(255,255,255));
+    amountOfLines = 1;
+    if(opt.attackUpAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'W' to attack Up!");
+        amountOfLines++;
+    }
+    else if(opt.attackDownAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'S' to attack Down!");
+        amountOfLines++;
+    }
+    else if(opt.attackRightAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'D' to attack Right!");
+        amountOfLines++;
+    }
+    else if(opt.attackLeftAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'A' to attack Left!");
+        amountOfLines++;
+    }
+    else if(opt.buyAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'B' to Buy!");
+        amountOfLines++;
+    }
+    else if(opt.moveAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'M' to Move!");
+        amountOfLines++;
+    }
+    else if(opt.passAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'P' to Pass!");
+        amountOfLines++;
+    }
+    //FALTA SEGUIRRR
 }

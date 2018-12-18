@@ -14,6 +14,17 @@ typedef struct{
     unsigned int y;
 }position_s;
 
+typedef struct{
+    bool attackUpAvailable;
+    bool attackDownAvailable;
+    bool attackRightAvailable;
+    bool attackLeftAvailable;
+    bool buyAvailable;
+    bool moveAvailable;
+    bool passAvailable;
+    //etc...
+}options_s;
+
 class MartusUnidades
 {
 public:
@@ -77,6 +88,7 @@ public:
     std::vector<MartusUnidades> getUnits();
     bool isThereAUnitThere(int x, int y);
     bool isThereABuildingThere(int x, int y);
+    options_s getOptions(int x , int y);
 protected:
     std::vector<MartusBuildings> buildings;
     std::vector<MartusTerrains> terrains;
