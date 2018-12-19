@@ -172,29 +172,7 @@ action_s Graphics::getUserAction(bool (* isTheActionValid)(action_s)){
     action.act = A_NO_ACTION;
     bool validity = false;
     //IMPRIMIR UN "YOUR TURN" O ALGO SIMILAR ANTES
-    if(!al_is_event_queue_empty(this->evQueue)){
-        while(al_get_next_event(this->evQueue,&ev) || action.act == A_NO_ACTION){
-            switch(ev.type){
-                case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                    al_destroy_display(this->display);
-                    al_destroy_event_queue(this->evQueue);
-                    action.act = A_CLOSE_GAME;
-                    break;
-                case ALLEGRO_EVENT_KEY_DOWN:
-                    action = getKeyboardAction(ev);
-                    validity = isTheActionValid(action);
-                    break;
-                case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                    action = getMouseAction(ev);
-                    validity = isTheActionValid(action);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-    if(!validity)
-        //DISPLAY ACTION NOT VALID DIALOG
+    getMouseAction();
     return action;
 }
 
@@ -214,20 +192,40 @@ std::vector<movement_s> Graphics::decodeMovements(){ //FINISH LATER
 }
 
 action_s Graphics::getMouseAction(ALLEGRO_EVENT ev){
-    int x = ev.mouse.x;
-    int y = ev.mouse.y;
-    x -= DISPLAY_WIDTH_OFFSET;
-    y -= DISPLAY_HEIGHT_OFFSET;
-    x /= TILE_SIDE;
-    y /= TILE_SIDE;
+    ALLEGRO_EVENT ev;
+    bool tmp = true;
     action_s temp;
-    temp.act = A_NO_ACTION;
-    if(ev.mouse.button == LEFT_CLICK){
-        temp = showPopUp(map.getOptions(xTile, yTile));
+    while(tmp){
+        al_get_next_event(this->evQueue,&ev);
+        switch(ev.type){
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                tmp = false;
+                break;
+            case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+                tmp = false;
+                break;
+            default:
+                break;
+        }
     }
+    if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+        int x = ev.mouse.x;
+        int y = ev.mouse.y;
+        x -= DISPLAY_WIDTH_OFFSET;
+        y -= DISPLAY_HEIGHT_OFFSET;
+        x /= TILE_SIDE;
+        y /= TILE_SIDE;
+        temp.act = A_NO_ACTION;
+        if(ev.mouse.button == LEFT_CLICK){
+            temp = showPopUp(map.getOptions(xTile, yTile),xTile, yTile);
+        }
+    }
+    else 
+        temp = A_CLOSE_GAME;
+    return temp;
 }
 
-action_s Graphics::showPopUp(options_s opt){
+action_s Graphics::showPopUp(options_s opt, int xTile, int yTile){
     unsigned int amountOfLines = 0;
     if(opt.attackUpAvailable)
         amountOfLines++;
@@ -243,9 +241,11 @@ action_s Graphics::showPopUp(options_s opt){
         amountOfLines++;
     else if(opt.passAvailable)
         amountOfLines++;
+    
     int x,y;
     al_get_mouse_cursor_position(&x,&y);
     al_draw_filled_rectangle(x,y,x+WIDTH_POPUP, y+(POPUP_LINE*amountOfLines),al_map_rgb(255,255,255));
+
     amountOfLines = 1;
     if(opt.attackUpAvailable){
         al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'W' to attack Up!");
@@ -275,5 +275,76 @@ action_s Graphics::showPopUp(options_s opt){
         al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'P' to Pass!");
         amountOfLines++;
     }
-    //FALTA SEGUIRRR
+
+    al_flip_display(display);
+
+    return getKeyboardAction(xTile,yTile);
+
+}
+
+action_s Graphics::getKeyboardAction(int xTile, int yTile){
+    ALLEGRO_EVENT ev;
+    action_s action;
+    action.act = A_NO_ACTION;
+    while(action.act == A_NO_ACTION){
+        al_get_next_event(this->evQueue,&ev);
+        switch(ev.type){
+            case ALLEGRO_EVENT_KEY_DOWN:
+                switch(ev.keyboard.keycode){
+                    case ALLEGRO_KEY_W:
+                        action.act = A_ATTACK;
+                        action.positionFrom.x = xTile;
+                        action.positionFrom.y = yTile; 
+                        action.positionTo.x = xTile;
+                        action.positionTo.y = yTile-1;
+                        break;
+                    case ALLEGRO_KEY_A:
+                        action.act = A_ATTACK;
+                        action.positionFrom.x = xTile;
+                        action.positionFrom.y = yTile; 
+                        action.positionTo.x = xTile-1;
+                        action.positionTo.y = yTile;
+                        break;
+                    case ALLEGRO_KEY_S:
+                        action.act = A_ATTACK;
+                        action.positionFrom.x = xTile;
+                        action.positionFrom.y = yTile; 
+                        action.positionTo.x = xTile;
+                        action.positionTo.y = yTile+1;
+                        break;
+                    case ALLEGRO_KEY_D:
+                        action.act = A_ATTACK;
+                        action.positionFrom.x = xTile;
+                        action.positionFrom.y = yTile; 
+                        action.positionTo.x = xTile+1;
+                        action.positionTo.y = yTile;
+                        break;
+                    case ALLEGRO_KEY_B:
+                        action.act = A_PURCHASE;
+                        break;
+                    case ALLEGRO_KEY_P:
+                        action.act = A_PASS;
+                        break;
+                    case ALLEGRO_KEY_M:
+                        action.act = A_MOVE;
+                        positionFrom.x = xTile;
+                        positionFrom.y = yTile;
+                        positionTo.x = ;
+                        positionTo.y = ;                    //COMPLETARR
+                        break;
+                    default:
+                        action.act = A_NO_ACTION;
+                        break;
+
+                }
+                break;
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                action.act = A_CLOSE_GAME;
+                break;
+            default:
+                action.act = A_NO_ACTION;
+                break;
+        }
+    }
+    return action;
 }
