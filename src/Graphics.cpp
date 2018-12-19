@@ -166,13 +166,12 @@ errors_s Graphics::drawUnit(MartusUnidades unitToDraw){
     return error;
 }
 
-action_s Graphics::getUserAction(bool (* isTheActionValid)(action_s)){
+action_s Graphics::getUserAction(){
     ALLEGRO_EVENT ev;
     action_s action;
     action.act = A_NO_ACTION;
-    bool validity = false;
     //IMPRIMIR UN "YOUR TURN" O ALGO SIMILAR ANTES
-    getMouseAction();
+    action getMouseAction();
     return action;
 }
 
@@ -181,7 +180,7 @@ void Graphics::setTeam(int team){
     return;
 }
 
-std::vector<movement_s> Graphics::decodeMovements(){ //FINISH LATER
+/*std::vector<movement_s> Graphics::decodeMovements(){ //FINISH LATER
     std::vector<movement_s> movements;
     std::vector<unsigned int> temp;
     for(unsigned int i = 0; i < min(this->unitList.size(),this->newUnitList.size()); i++){
@@ -189,9 +188,9 @@ std::vector<movement_s> Graphics::decodeMovements(){ //FINISH LATER
             temp.push_back(i);
     }
 
-}
+}*/
 
-action_s Graphics::getMouseAction(ALLEGRO_EVENT ev){
+action_s Graphics::getMouseAction(){
     ALLEGRO_EVENT ev;
     bool tmp = true;
     action_s temp;
@@ -202,7 +201,8 @@ action_s Graphics::getMouseAction(ALLEGRO_EVENT ev){
                 tmp = false;
                 break;
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                tmp = false;
+                if(ev.mouse.button == LEFT_CLICK)
+                    tmp = false;
                 break;
             default:
                 break;
@@ -216,9 +216,7 @@ action_s Graphics::getMouseAction(ALLEGRO_EVENT ev){
         x /= TILE_SIDE;
         y /= TILE_SIDE;
         temp.act = A_NO_ACTION;
-        if(ev.mouse.button == LEFT_CLICK){
-            temp = showPopUp(map.getOptions(xTile, yTile),xTile, yTile);
-        }
+        temp = showPopUp(map.getOptions(xTile, yTile),xTile, yTile);
     }
     else 
         temp = A_CLOSE_GAME;

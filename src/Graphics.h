@@ -74,7 +74,7 @@ jugador oponente. Se le pasa el nuevo vector de unidades, y el nuevo vector de e
 dentro de esta clase. Y una vez actualizado grafica todas las lineas del mapa para que se vean en pantalla.
 Devuelve: un errors_s que estan especificados al principio de este archivo
 */
-    action_s getUserAction(bool (* isTheActionValid)(action_s));
+    action_s getUserAction();
 /*Funcion encargada de obtener los movimientos que haga el usuario. Recibe como parametro un callback
 al que se le pasara una accion y respondera true si esa accion es valida, o false si no lo es.
 Devuelve: una action_s
@@ -90,13 +90,13 @@ private:
     errors_s drawTerrain(MartusTerrains terrainToDraw);//partially done
     errors_s drawBuilding(MartusBuildings buildingToDraw);//partially done
     errors_s drawUnit(MartusUnidades unitToDraw);//partially done
-    errors_s loadGraphics();//not done
-    std::vector<movement_s> decodeMovements();//not done
+    //errors_s loadGraphics();//not done
+    //std::vector<movement_s> decodeMovements();//not done
     errors_s showTransition(std::vector<movement_s> movements);//not done
-    bool unitsAreEqual(MartusUnidades unit1, MartusUnidades unit2);//not done
-    action_s getMouseAction(ALLEGRO_EVENT ev);//not done
-    action_s getKeyboardAction(ALLEGRO_EVENT ev);//not done
-    void showPopUp(); //not done
+    //bool unitsAreEqual(MartusUnidades unit1, MartusUnidades unit2);//not done
+    action_s getMouseAction();//partially done
+    action_s getKeyboardAction(int xTile, int yTile);//partially done
+    action_s showPopUp(options_s opt, int xTile, int yTile); //partially done
 
 
     std::vector<MartusUnidades> newUnitList;
