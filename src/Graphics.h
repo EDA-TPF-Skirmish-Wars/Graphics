@@ -61,6 +61,7 @@ el tercero con edificios.
 NO devuelve nada.
 */
     ~Graphics();
+    
     void setTeam(int team);
 /*Funcion de seteo del team del correspondiente jugador, se le debe pasar TEAM0 o TEAM1 como parametro y no devuelve nada.
 Sirve para ver el color de tus propias unidades.

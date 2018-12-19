@@ -53,15 +53,16 @@ errors_s Graphics::updateGraphics(std::vector<MartusUnidades> newUnitList,
     errors_s error = G_NO_ERROR;
     for(unsigned int u = 0 ; u < 12; u++){
         error = showLine(u);
-        if(error == G_NO_ERROR){
-            al_flip_display(display);
-        }
     }
+    if(error == G_NO_ERROR){
+        al_flip_display(display);
+    }
+
     //Update class variables, and freeing memory
-    this->newUnitList.clear();
-    this->newBuildingList.clear();
     this->unitList = newUnitList;
     this->buildingList = newBuildingList;
+    this->newUnitList.clear();
+    this->newBuildingList.clear();
     return error;
 }
 
@@ -85,7 +86,6 @@ errors_s Graphics::showLine(unsigned int line){
             unitsInLine.push_back(this->unitList[j]);
     }
 
-    //this->showTransition(this->decodeMovements());
     //FALTA HACER LA TRANSICION ENTRE MOVIMIENTOS PARA QUE EL JUEGO SE VEA MAS FLUIDO
     //tengo cargado en las listas los elementos de la fila correspodiente
     //dibujo cada elemento en su correspondiente lugar
