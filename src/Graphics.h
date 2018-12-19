@@ -1,6 +1,11 @@
 //////////////////////////////////////////////////////////
-//              GRAPHICS.H                              //
-// ALLEGRO NECESITA ESTAR INICIALIZADO                  //
+//Libreria Graphics                                     //
+//Encargada de manejar toda la parte grafica del juego  //
+//skirmich Wars. TP FINAL EDA, 1er Cuatrimestre 2017    //
+//Trabajo Hecho por:                                    //
+//  -Ian Diaz                                           //
+//  -Martina Maspero                                    //
+//                                          26/08/2018  //
 //////////////////////////////////////////////////////////
 /*Definiciones:
 -   Las posiciones son discretas y estan horizontalmente de 0 a 15 y verticalmente de 0-11.
