@@ -20,7 +20,10 @@ typedef struct{
     bool attackRightAvailable;
     bool attackLeftAvailable;
     bool buyAvailable;
-    bool moveAvailable;
+    bool moveUpAvailable;
+    bool moveDownAvailable;
+    bool moveLeftAvailable;
+    bool moveRightAvailable;
     bool passAvailable;
     //etc...
 }options_s;

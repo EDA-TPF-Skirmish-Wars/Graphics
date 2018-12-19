@@ -52,9 +52,7 @@ errors_s Graphics::updateGraphics(std::vector<MartusUnidades> newUnitList,
     this->newBuildingList = newBuildingList;
     errors_s error = G_NO_ERROR;
     for(unsigned int u = 0 ; u < 12; u++){
-        for(unsigned int i = 0 ; i < 16 ; i++){
-            error = showLine(u);
-        }
+        error = showLine(u);
         if(error == G_NO_ERROR){
             al_flip_display(display);
         }
@@ -235,7 +233,13 @@ action_s Graphics::showPopUp(options_s opt, int xTile, int yTile){
         amountOfLines++;
     else if(opt.buyAvailable)
         amountOfLines++;
-    else if(opt.moveAvailable)
+    else if(opt.moveUpAvailable)
+        amountOfLines++;
+    else if(opt.moveDownAvailable)
+        amountOfLines++;
+    else if(opt.moveLeftAvailable)
+        amountOfLines++;
+    else if(opt.moveRightAvailable)
         amountOfLines++;
     else if(opt.passAvailable)
         amountOfLines++;
@@ -265,8 +269,20 @@ action_s Graphics::showPopUp(options_s opt, int xTile, int yTile){
         al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'B' to Buy!");
         amountOfLines++;
     }
-    else if(opt.moveAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'M' to Move!");
+    else if(opt.moveUpAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press Up Arrow to Move Up!");
+        amountOfLines++;
+    }
+    else if(opt.moveDownAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press Down Arrow to Move Down!");
+        amountOfLines++;
+    }
+    else if(opt.moveLeftAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press Left Arrow to Move Left!");
+        amountOfLines++;
+    }
+    else if(opt.moveRightAvailable){
+        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press Right Arrow to Move Right!");
         amountOfLines++;
     }
     else if(opt.passAvailable){
@@ -323,12 +339,33 @@ action_s Graphics::getKeyboardAction(int xTile, int yTile){
                     case ALLEGRO_KEY_P:
                         action.act = A_PASS;
                         break;
-                    case ALLEGRO_KEY_M:
+                    case ALLEGRO_KEY_UP:
                         action.act = A_MOVE;
                         positionFrom.x = xTile;
                         positionFrom.y = yTile;
-                        positionTo.x = ;
-                        positionTo.y = ;                    //COMPLETARR
+                        positionTo.x = xTile;
+                        positionTo.y = yTile-1;
+                        break;
+                    case ALLEGRO_KEY_DOWN:
+                        action.act = A_MOVE;
+                        positionFrom.x = xTile;
+                        positionFrom.y = yTile;
+                        positionTo.x = xTile;
+                        positionTo.y = yTile+1;
+                        break;
+                    case ALLEGRO_KEY_LEFT:
+                        action.act = A_MOVE;
+                        positionFrom.x = xTile;
+                        positionFrom.y = yTile;
+                        positionTo.x = xTile-1;
+                        positionTo.y = yTile;
+                        break;
+                    case ALLEGRO_KEY_RIGHT:
+                        action.act = A_MOVE;
+                        positionFrom.x = xTile;
+                        positionFrom.y = yTile;
+                        positionTo.x = xTile+1;
+                        positionTo.y = yTile;
                         break;
                     default:
                         action.act = A_NO_ACTION;

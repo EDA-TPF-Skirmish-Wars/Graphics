@@ -87,6 +87,10 @@ protected:
     int team;
 private:
     errors_s showLine(unsigned int i); //partially done
+    //
+    //Funcion encargada de dibujar en el display la linea numero i contando de arriba hacia abajo, es decir la linea
+    // numero 0 es la linea horizontal superior y la linea numero 11  es la linea horizontal inferior.
+    //
     errors_s drawTerrain(MartusTerrains terrainToDraw);//partially done
     errors_s drawBuilding(MartusBuildings buildingToDraw);//partially done
     errors_s drawUnit(MartusUnidades unitToDraw);//partially done
