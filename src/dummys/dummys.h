@@ -3,11 +3,13 @@
 #include <iostream>
 #include <string>
 
+
 using namespace std;
 
-typedef enum{UNIDAD_1,UNIDAD_2,UNIDAD_3,UNIDAD_4,UNIDAD_5,UNIDAD_6,UNIDAD_7}units_d;
+typedef enum{UNIDAD_1,UNIDAD_2,UNIDAD_3,UNIDAD_4,UNIDAD_5,UNIDAD_6,UNIDAD_7,UNIDAD_8,UNIDAD_9}units_d;
 typedef enum{TERRENO_1,TERRENO_2,TERRENO_3,TERRENO_4,TERRENO_5,TERRENO_6}terrains_d;
 typedef enum{EDIFICIO_1,EDIFICIO_2,EDIFICIO_3,EDIFICIO_4,EDIFICIO_5}buildings_d;
+typedef enum{TEAM_1,TEAM_2,TEAM_3,TEAM_4}teams_d;
 
 typedef struct{
     unsigned int x;
@@ -25,7 +27,6 @@ typedef struct{
     bool moveLeftAvailable;
     bool moveRightAvailable;
     bool passAvailable;
-    //etc...
 }options_s;
 
 class MartusUnidades
@@ -52,13 +53,11 @@ public:
     position_s getPosition();
     terrains_d getTypeOfTerrain();
     string getImagePath();
-    int getTeam();
     bool getFog();
     void setFogOn();
 protected:
     position_s position;
     string imagePath;
-    int team;
     bool fog;
 private:
     terrains_d typeOfTerrain;
@@ -78,6 +77,7 @@ protected:
     string imagePath;
     int team;
     bool fog;
+	bool buildingIsFree;
 private:
     buildings_d typeOfBuilding;
 };
