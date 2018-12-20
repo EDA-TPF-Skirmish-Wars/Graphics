@@ -1,4 +1,5 @@
 #include "./Graphics.h"
+#include "../Network/Timer.h"
 #define DISPLAY_WIDTH   800
 #define DISPLAY_HEIGHT  600
 #define DISPLAY_WIDTH_OFFSET    0
@@ -6,25 +7,20 @@
 #define TILE_SIDE   50
 #define LEFT_CLICK  1
 #define OPTIONS_MENU_AMOUNT  10
+#define FONT_SIZE_SMALL		5
+#define FONT_SIZE_LARGE		20
 
 #define WIDTH_POPUP     100
 #define POPUP_LINE      15  
 #define HEIGHT_POPUP    (POPUP_LINE * OPTIONS_MENU_AMOUNT)
 
-#ifdef __linux__
-    #include <allegro5/allegro_image.h>
-    #include <allegro5/allegro_primitives.h>
-    #include <allegro5/allegro_font.h>
-#elif _WIN32
-    #include <allegro5/allegro_image>
-    #include <allegro5/allegro_primitives>
-    #include <allegro5/allegro_font>
-#endif
+
 
 
 Graphics::Graphics(std::vector<MartusTerrains> newTerrainList, 
                     std::vector<MartusUnidades> newUnitList, 
                     std::vector<MartusBuildings> newBuildingList){
+	this->graphicsError = G_NO_ERROR;
     this->terrainList = newTerrainList;
     this->unitList = newUnitList;
     this->buildingList = newBuildingList;
@@ -33,15 +29,30 @@ Graphics::Graphics(std::vector<MartusTerrains> newTerrainList,
     al_register_event_source(this->evQueue,al_get_keyboard_event_source());
     al_register_event_source(this->evQueue,al_get_mouse_event_source());
     this->display = al_create_display(DISPLAY_WIDTH,DISPLAY_HEIGHT);
+	if (display == NULL) {
+		graphicsError = G_DISPLAY_ERROR;
+	}
     al_register_event_source(this->evQueue,al_get_display_event_source(this->display));
     al_init_primitives_addon();
     al_init_font_addon();
-    font = al_load_font("resources/font.tga");
+    font = al_load_font("resources/font.tga",FONT_SIZE_SMALL,0); //VER SI ESTOS 2 CEROS ESTAN BIEN
+	if (font == NULL) {
+		graphicsError = G_LOAD_FONT_ERROR;
+	}
+	fontLarge = al_load_font("resources/font.tga", FONT_SIZE_LARGE, 0);
+	if (fontLarge == NULL) {
+		graphicsError = G_LOAD_FONT_ERROR;
+	}
     return;
 }
 
-Graphics::~Graphics(){
-    al_destroy_display(display);
+Graphics::~Graphics() {
+	if (display != NULL) {
+		al_destroy_display(display);
+	}
+	if (font != NULL) {
+		al_destroy_font(font);
+	}
     //disallocate memory
     return;
 }
@@ -50,29 +61,33 @@ errors_s Graphics::updateGraphics(std::vector<MartusUnidades> newUnitList,
                                 std::vector<MartusBuildings> newBuildingList){
     this->newUnitList = newUnitList;
     this->newBuildingList = newBuildingList;
-    errors_s error = G_NO_ERROR;
-    for(unsigned int u = 0 ; u < 12; u++){
-        error = showLine(u);
-    }
-    if(error == G_NO_ERROR){
-        al_flip_display(display);
-    }
-
+	showTransition();
+	drawMap();
+	if (graphicsError == G_NO_ERROR) {
+		al_flip_display();
+	}
     //Update class variables, and freeing memory
     this->unitList = newUnitList;
     this->buildingList = newBuildingList;
     this->newUnitList.clear();
     this->newBuildingList.clear();
-    return error;
+    return graphicsError;
 }
 
-errors_s Graphics::showLine(unsigned int line){
+void Graphics::drawMap() {
+	for (unsigned int u = 0; u < 12; u++) {
+		showLine(u);
+	}
+	return;
+}
+
+void Graphics::showLine(unsigned int line){
     //Dibuja los elementos que se encuentran en la linea i del mapa, las lineas van de 0-11 y las columnas de 0-15
     std::vector<MartusTerrains> terrainsInLine;     //Creo vectores con los los elementos de la linea a dibujar
     std::vector<MartusBuildings> buildingsInLine;
     std::vector<MartusUnidades> unitsInLine;
-    errors_s error;
-    //Cargo los elementos encontrados en la linea en cada vector
+	
+	//Cargo los elementos encontrados en la linea en cada vector
     for(unsigned int j=line*16 ; j < (line+1)*16 ; j++){
         if(this->terrainList[j].getPosition().x == line)
             terrainsInLine.push_back(this->terrainList[j]);
@@ -93,83 +108,86 @@ errors_s Graphics::showLine(unsigned int line){
     //CREO Q HABRIA QUE IMPRIMIR TODA LA PANTALLA EN NEGRO ANTES DE VOLVER A DIBUJAR
 
     for(unsigned int o = 0; o <= terrainsInLine.size(); o++){
-        error = this->drawTerrain(terrainsInLine[o]);
+        this->drawTerrain(terrainsInLine[o]);
     }
     for(unsigned int o = 0; o <= buildingsInLine.size(); o++){
-        error = this->drawBuilding(buildingsInLine[o]);
+        this->drawBuilding(buildingsInLine[o]);
     }
     for(unsigned int o = 0; o <= unitsInLine.size(); o++){
-        error = this->drawUnit(unitsInLine[o]);
+        this->drawUnit(unitsInLine[o]);
     }
-    //if(error == G_NO_ERROR)
-    //    al_flip_display();
-    return error;
+
+	return;
 }
 
-errors_s Graphics::drawTerrain(MartusTerrains terrainToDraw){
-    errors_s error = G_NO_ERROR;
+void Graphics::drawTerrain(MartusTerrains terrainToDraw){
+	if (graphicsError == G_NO_ERROR) {
 #ifdef FOW
-    if(terrainToDraw.getFog() == false){
+		if (terrainToDraw.getFog() == false) {
 #endif
-        ALLEGRO_BITMAP * bmp = al_load_bitmap(terrainToDraw.getImagePath().c_str());
-        if(bmp != NULL){
-            al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
-                            terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
-            al_destroy_bitmap(bmp);
-        }
-        else
-            error = G_LOAD_BITMAP_ERROR;
+			ALLEGRO_BITMAP * bmp = al_load_bitmap(terrainToDraw.getImagePath().c_str());
+			if (bmp != NULL) {
+				al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+					terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
+				al_destroy_bitmap(bmp);
+			}
+			else
+				graphicsError = G_LOAD_BITMAP_ERROR;
 #ifdef FOW
-    }
+		}
 #endif
-    return error;
+	}
+	return;
 }
 
-errors_s Graphics::drawBuilding(MartusBuildings buildingToDraw){
-    errors_s error = G_NO_ERROR;
+void Graphics::drawBuilding(MartusBuildings buildingToDraw){
+    //errors_s error = G_NO_ERROR;
+	if (graphicsError == G_NO_ERROR) {
 #ifdef FOW
-    if(buildingToDraw.getFog() == false){
+		if (buildingToDraw.getFog() == false) {
 #endif
-        ALLEGRO_BITMAP * bmp = al_load_bitmap(buildingToDraw.getImagePath().c_str());
-        if(bmp != NULL){
-            al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE +DISPLAY_WIDTH_OFFSET,
-                            buildingToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
-            al_destroy_bitmap(bmp);
-        }
-        else
-            error = G_LOAD_BITMAP_ERROR;
+			ALLEGRO_BITMAP * bmp = al_load_bitmap(buildingToDraw.getImagePath().c_str());
+			if (bmp != NULL) {
+				al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+					buildingToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
+				al_destroy_bitmap(bmp);
+			}
+			else
+				graphicsError = G_LOAD_BITMAP_ERROR;
 #ifdef FOW
-    }
+		}
 #endif
-    return error;
+	}
+	return; //error;
 }
 
-errors_s Graphics::drawUnit(MartusUnidades unitToDraw){
-    errors_s error = G_NO_ERROR;
+void Graphics::drawUnit(MartusUnidades unitToDraw){
+    //errors_s error = G_NO_ERROR;
+	if (graphicsError == G_NO_ERROR) {
 #ifdef FOW
-    if(unitToDraw.getFog() == false){
+		if (unitToDraw.getFog() == false) {
 #endif
-        ALLEGRO_BITMAP * bmp = al_load_bitmap(unitToDraw.getImagePath().c_str());
-        
-        if(bmp != NULL){
-            al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
-                            unitToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
-            al_destroy_bitmap(bmp);
-        }
-        else
-            error = G_LOAD_BITMAP_ERROR;
+			ALLEGRO_BITMAP * bmp = al_load_bitmap(unitToDraw.getImagePath().c_str());
+
+			if (bmp != NULL) {
+				al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+					unitToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
+				al_destroy_bitmap(bmp);
+			}
+			else
+				graphicsError = G_LOAD_BITMAP_ERROR;
 #ifdef FOW
-    }
+		}
 #endif
-    return error;
+	}
+	return;// error;
 }
 
 action_s Graphics::getUserAction(){
-    ALLEGRO_EVENT ev;
     action_s action;
-    action.act = A_NO_ACTION;
-    //IMPRIMIR UN "YOUR TURN" O ALGO SIMILAR ANTES
-    action getMouseAction();
+	action.act = A_NO_ACTION;
+	drawMessage();
+	action = getMouseAction();
     return action;
 }
 
@@ -177,16 +195,6 @@ void Graphics::setTeam(int team){
     this->team = team;
     return;
 }
-
-/*std::vector<movement_s> Graphics::decodeMovements(){ //FINISH LATER
-    std::vector<movement_s> movements;
-    std::vector<unsigned int> temp;
-    for(unsigned int i = 0; i < min(this->unitList.size(),this->newUnitList.size()); i++){
-        if(!unitsAreEqual(unitList[i],newUnitList[i]));
-            temp.push_back(i);
-    }
-
-}*/
 
 action_s Graphics::getMouseAction(){
     ALLEGRO_EVENT ev;
@@ -209,15 +217,14 @@ action_s Graphics::getMouseAction(){
     if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
         int x = ev.mouse.x;
         int y = ev.mouse.y;
-        x -= DISPLAY_WIDTH_OFFSET;
-        y -= DISPLAY_HEIGHT_OFFSET;
-        x /= TILE_SIDE;
-        y /= TILE_SIDE;
+		int xTile, yTile;
+        xTile = (x - DISPLAY_WIDTH_OFFSET)/TILE_SIDE;
+        yTile = (y - DISPLAY_HEIGHT_OFFSET)/TILE_SIDE;
         temp.act = A_NO_ACTION;
         temp = showPopUp(map.getOptions(xTile, yTile),xTile, yTile);
     }
     else 
-        temp = A_CLOSE_GAME;
+        temp.act = A_CLOSE_GAME;
     return temp;
 }
 
@@ -290,7 +297,7 @@ action_s Graphics::showPopUp(options_s opt, int xTile, int yTile){
         amountOfLines++;
     }
 
-    al_flip_display(display);
+    al_flip_display();
 
     return getKeyboardAction(xTile,yTile);
 
@@ -341,31 +348,31 @@ action_s Graphics::getKeyboardAction(int xTile, int yTile){
                         break;
                     case ALLEGRO_KEY_UP:
                         action.act = A_MOVE;
-                        positionFrom.x = xTile;
-                        positionFrom.y = yTile;
-                        positionTo.x = xTile;
-                        positionTo.y = yTile-1;
+                        action.positionFrom.x = xTile;
+						action.positionFrom.y = yTile;
+						action.positionTo.x = xTile;
+						action.positionTo.y = yTile-1;
                         break;
                     case ALLEGRO_KEY_DOWN:
                         action.act = A_MOVE;
-                        positionFrom.x = xTile;
-                        positionFrom.y = yTile;
-                        positionTo.x = xTile;
-                        positionTo.y = yTile+1;
+						action.positionFrom.x = xTile;
+						action.positionFrom.y = yTile;
+						action.positionTo.x = xTile;
+						action.positionTo.y = yTile+1;
                         break;
                     case ALLEGRO_KEY_LEFT:
                         action.act = A_MOVE;
-                        positionFrom.x = xTile;
-                        positionFrom.y = yTile;
-                        positionTo.x = xTile-1;
-                        positionTo.y = yTile;
+						action.positionFrom.x = xTile;
+						action.positionFrom.y = yTile;
+						action.positionTo.x = xTile-1;
+						action.positionTo.y = yTile;
                         break;
                     case ALLEGRO_KEY_RIGHT:
                         action.act = A_MOVE;
-                        positionFrom.x = xTile;
-                        positionFrom.y = yTile;
-                        positionTo.x = xTile+1;
-                        positionTo.y = yTile;
+						action.positionFrom.x = xTile;
+						action.positionFrom.y = yTile;
+						action.positionTo.x = xTile+1;
+						action.positionTo.y = yTile;
                         break;
                     default:
                         action.act = A_NO_ACTION;
@@ -382,4 +389,39 @@ action_s Graphics::getKeyboardAction(int xTile, int yTile){
         }
     }
     return action;
+}
+
+errors_s Graphics::getError() {
+	return graphicsError;
+}
+
+void Graphics::showTransition() {
+	if (graphicsError == G_NO_ERROR) {
+		for (unsigned int i = 0; i < 255; i++) {
+			al_clear_to_color(al_map_rgb(i, i, i));
+			al_draw_text(fontLarge, al_map_rgb((255-i),(255-i), (255-i)), (DISPLAY_WIDTH/2), (DISPLAY_HEIGHT/2), 0, 
+				"Some changes have been happening during night!");
+			al_flip_display();
+			timerMiliseconds(10);
+		}
+	}
+	return;
+}
+
+void Graphics::drawMessage() {
+	for (unsigned int i = 0; i < 5; i++) {
+		drawMap();
+		al_draw_filled_rectangle((DISPLAY_WIDTH / 2) - 50, (DISPLAY_HEIGHT / 2) - 50, (DISPLAY_WIDTH / 2) + 50,
+			(DISPLAY_HEIGHT / 2) + 50, al_map_rgb(255, 255, 255));
+		al_draw_text(font, al_map_rgb(0, 0, 0), (DISPLAY_WIDTH / 2), (DISPLAY_HEIGHT / 2), 0, "Your Turn!");
+		if (graphicsError == G_NO_ERROR) {
+			al_flip_display();
+		}
+		timerMiliseconds(1000);
+		drawMap();
+		if (graphicsError == G_NO_ERROR) {
+			al_flip_display();
+		}
+	}
+	return;
 }

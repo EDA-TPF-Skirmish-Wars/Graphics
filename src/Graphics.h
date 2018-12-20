@@ -31,11 +31,21 @@
     #include "./dummys/dummys.h"
 #endif
 
+
 #ifdef __linux__
-    #include <allegro5/allegro.h>
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+
 #elif _WIN32
-    #include <allegro5/allegro>
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
 #endif
+
+
 
 typedef struct{
     act_s act;
@@ -45,7 +55,7 @@ typedef struct{
 
 typedef enum {A_NO_ACTION, A_ATTACK, A_MOVE , A_PURCHASE, A_PASS ,A_CLOSE_GAME}act_s;
 
-typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR}errors_s;
+typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR, G_DISPLAY_ERROR, G_LOAD_FONT_ERROR}errors_s;
 
 typedef struct{
     position_s positionFrom;
@@ -85,6 +95,9 @@ Devuelve: un errors_s que estan especificados al principio de este archivo
 al que se le pasara una accion y respondera true si esa accion es valida, o false si no lo es.
 Devuelve: una action_s
 */
+
+	errors_s getError();
+
 protected:
     std::vector<MartusUnidades> unitList;
     std::vector<MartusBuildings> buildingList;
@@ -92,21 +105,21 @@ protected:
     MartusMap map;
     int team;
 private:
-    errors_s showLine(unsigned int i); //partially done
+    void showLine(unsigned int i); //partially done
     //
     //Funcion encargada de dibujar en el display la linea numero i contando de arriba hacia abajo, es decir la linea
     // numero 0 es la linea horizontal superior y la linea numero 11  es la linea horizontal inferior.
     //
-    errors_s drawTerrain(MartusTerrains terrainToDraw);//partially done
-    errors_s drawBuilding(MartusBuildings buildingToDraw);//partially done
-    errors_s drawUnit(MartusUnidades unitToDraw);//partially done
-    //errors_s loadGraphics();//not done
-    //std::vector<movement_s> decodeMovements();//not done
-    errors_s showTransition(std::vector<movement_s> movements);//not done
-    //bool unitsAreEqual(MartusUnidades unit1, MartusUnidades unit2);//not done
-    action_s getMouseAction();//partially done
+    void drawTerrain(MartusTerrains terrainToDraw);//partially done
+    void drawBuilding(MartusBuildings buildingToDraw);//partially done
+    void drawUnit(MartusUnidades unitToDraw);//partially done
+    void showTransition();//not done
+    action_s getMouseAction(void);//partially done
     action_s getKeyboardAction(int xTile, int yTile);//partially done
     action_s showPopUp(options_s opt, int xTile, int yTile); //partially done
+	void drawMap();//done
+	void drawMessage();
+
 
 
     std::vector<MartusUnidades> newUnitList;
@@ -114,7 +127,9 @@ private:
     std::vector<MartusTerrains> newTerrainList;
     ALLEGRO_DISPLAY * display = NULL;
     ALLEGRO_EVENT_QUEUE * evQueue = NULL;
-    ALLEGRO_FONT *font;
+    ALLEGRO_FONT *font = NULL;
+	ALLEGRO_FONT *fontLarge = NULL;
+	errors_s graphicsError;
 };
 
 #endif
