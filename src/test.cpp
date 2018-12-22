@@ -46,5 +46,7 @@ int main(void) {
 	tstUnit.setUnit(UNIDAD_2, pos, TEAM_4, true);
 	tstMap.addUnit(tstUnit);
 	tstGr.updateGraphics(tstMap.getUnits(),tstMap.getBuildings());
+	tstGr.getUserAction();
+	tstGr.showDices(13, 5);
 	return 0;
 }

@@ -50,7 +50,7 @@
 
 typedef enum {A_NO_ACTION, A_ATTACK, A_MOVE , A_PURCHASE, A_PASS ,A_CLOSE_GAME}act_s;
 
-typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR, G_DISPLAY_ERROR, G_LOAD_FONT_ERROR}errors_s;
+typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR, G_DISPLAY_ERROR, G_LOAD_FONT_ERROR, G_GAME_CLOSED}errors_s;
 
 typedef struct{
     position_s positionFrom;
@@ -76,7 +76,7 @@ public:
 el tercero con edificios.
 NO devuelve nada.
 */
-    ~Graphics();
+    ~Graphics();//Funciona perfecta
     
     void setTeam(int team);
 /*Funcion de seteo del team del correspondiente jugador, se le debe pasar TEAM_1, TEAM_2, TEAM_3 o TEAM_4 como parametro y no devuelve nada.
@@ -100,6 +100,8 @@ Devuelve: una action_s
 	errors_s getError();
 
 	void displayActionInvalid();//Funciona perfecta
+
+	void showDices(int yours, int enemys);//Funciona perfecta
 
 protected:
     std::vector<MartusUnidades> unitList;

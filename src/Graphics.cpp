@@ -1,9 +1,9 @@
 #include "./Graphics.h"
 #include "../Network/Timer.h"
 #define DISPLAY_WIDTH   1100
-#define DISPLAY_HEIGHT  600
-#define DISPLAY_WIDTH_OFFSET    0
-#define DISPLAY_HEIGHT_OFFSET    0
+#define DISPLAY_HEIGHT  630
+#define DISPLAY_WIDTH_OFFSET    15
+#define DISPLAY_HEIGHT_OFFSET    15
 #define TILE_SIDE   50
 #define LEFT_CLICK  1
 #define OPTIONS_MENU_AMOUNT  10
@@ -82,23 +82,25 @@ errors_s Graphics::updateGraphics(std::vector<MartusUnidades> newUnitList,
 	if (graphicsError == G_NO_ERROR) {
 		al_flip_display();
 	}
-    //Update class variables, and freeing memory
     return graphicsError;
 }
 
 void Graphics::drawMap() {
-	al_clear_to_color(al_map_rgb(0, 0, 0));
-	for (unsigned int u = 0; u < 12; u++) {
-		showLine(u);
+	if (graphicsError == G_NO_ERROR) {
+		al_clear_to_color(al_map_rgb(0, 0, 0));
+		for (unsigned int u = 0; u < 12; u++) {
+			showLine(u);
+		}
+		string str = "./resources/frame.png";
+		ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
+		al_draw_scaled_bitmap(bmp, 67, 55, 995, 1490, 0, 0, TILE_SIDE * 16 + (DISPLAY_WIDTH_OFFSET * 2),
+			TILE_SIDE * 12 + (DISPLAY_HEIGHT_OFFSET * 2), 0);
+		al_destroy_bitmap(bmp);
+		str = "./resources/pop-up.png";
+		bmp = al_load_bitmap(str.c_str());
+		al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, TILE_SIDE * 16, -24, TILE_SIDE * 6.6, TILE_SIDE *13.5, 0);
+		al_destroy_bitmap(bmp);
 	}
-	string str = "./resources/frame.png";
-	ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
-	al_draw_scaled_bitmap(bmp, 68, 55, 994,1490, 0, 0, TILE_SIDE * 16, TILE_SIDE * 12, 0);
-	al_destroy_bitmap(bmp);
-	str = "./resources/pop-up.png";
-	bmp = al_load_bitmap(str.c_str());
-	al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, TILE_SIDE * 16, 0, TILE_SIDE * 6, TILE_SIDE *12 , 0);
-	al_destroy_bitmap(bmp);
 	return;
 }
 
@@ -197,7 +199,7 @@ void Graphics::drawUnit(MartusUnidades unitToDraw){
 			if (bmp != NULL) {
 				//al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
 				//	unitToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
-				al_draw_scaled_bitmap(bmp, 0,0,51,58, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+				al_draw_scaled_bitmap(bmp, 0,0,105,105, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET, //51,58
 					unitToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET,TILE_SIDE,TILE_SIDE,0);
 				al_destroy_bitmap(bmp);
 			}
@@ -215,6 +217,11 @@ action_s Graphics::getUserAction(){
 	action.act = A_NO_ACTION;
 	drawMessage();
 	action = getMouseAction();
+	if (action.act == A_CLOSE_GAME) {
+		al_destroy_display(display);
+		display = NULL;
+		graphicsError = G_GAME_CLOSED;
+	}
     return action;
 }
 
@@ -280,47 +287,49 @@ action_s Graphics::showPopUp(options_s opt, int xTile, int yTile){
         amountOfLines++;
 
     amountOfLines = 1;
-    if(opt.attackUpAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),TILE_SIDE * 17,TILE_SIDE * (amountOfLines+1),0,"'W' to attack Up!");
-        amountOfLines++;
-    }
-    else if(opt.attackDownAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"'S' to attack Down!");
-        amountOfLines++;
-    }
-    else if(opt.attackRightAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"'D' to attack Right!");
-        amountOfLines++;
-    }
-    else if(opt.attackLeftAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"'A' to attack Left!");
-        amountOfLines++;
-    }
-    else if(opt.buyAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"'B' to Buy!");
-        amountOfLines++;
-    }
-    else if(opt.moveUpAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"Up Arrow to Move Up!");
-        amountOfLines++;
-    }
-    else if(opt.moveDownAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"Down Arrow to Move Down!");
-        amountOfLines++;
-    }
-    else if(opt.moveLeftAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"Left Arrow to Move Left!");
-        amountOfLines++;
-    }
-    else if(opt.moveRightAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"Right Arrow to Move Right!");
-        amountOfLines++;
-    }
-    else if(opt.passAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"'P' to Pass!");
-        amountOfLines++;
-    }
-    al_flip_display();
+	if (graphicsError == G_NO_ERROR) {
+		if (opt.attackUpAvailable) {
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'W' to attack Up!");
+			amountOfLines++;
+		}
+		else if (opt.attackDownAvailable) {
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'S' to attack Down!");
+			amountOfLines++;
+		}
+		else if (opt.attackRightAvailable) {
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'D' to attack Right!");
+			amountOfLines++;
+		}
+		else if (opt.attackLeftAvailable) {
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'A' to attack Left!");
+			amountOfLines++;
+		}
+		else if (opt.buyAvailable) {
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'B' to Buy!");
+			amountOfLines++;
+		}
+		else if (opt.moveUpAvailable) {
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "Up Arrow to Move Up!");
+			amountOfLines++;
+		}
+		else if (opt.moveDownAvailable) {
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "Down Arrow to Move Down!");
+			amountOfLines++;
+		}
+		else if (opt.moveLeftAvailable) {
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "Left Arrow to Move Left!");
+			amountOfLines++;
+		}
+		else if (opt.moveRightAvailable) {
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "Right Arrow to Move Right!");
+			amountOfLines++;
+		}
+		else if (opt.passAvailable) {
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'P' to Pass!");
+			amountOfLines++;
+		}
+		al_flip_display();
+	}
 
     return getKeyboardAction(xTile,yTile);
 
@@ -442,11 +451,18 @@ void Graphics::drawMessage() {
 	drawMap();
 	//al_draw_filled_rectangle((DISPLAY_WIDTH / 2) - 50, (DISPLAY_HEIGHT / 2) - 50, (DISPLAY_WIDTH / 2) + 50,
 	//	(DISPLAY_HEIGHT / 2) + 50, al_map_rgb(255, 255, 255));
-	string str = "./resources/pop-up.png";
-	ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
-	al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, DISPLAY_WIDTH/4,DISPLAY_HEIGHT/4, TILE_SIDE * 5, TILE_SIDE*5, 0);
-	al_destroy_bitmap(bmp);
-	al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE*7, TILE_SIDE * 5, 0, "Your Turn!");
+	if (graphicsError == G_NO_ERROR) {
+		string str = "./resources/pop-up.png";
+		ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
+		if (bmp == NULL) {
+			graphicsError = G_LOAD_BITMAP_ERROR;
+		}
+		else {
+			al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, DISPLAY_WIDTH / 4, DISPLAY_HEIGHT / 4, TILE_SIDE * 5, TILE_SIDE * 5, 0);
+			al_destroy_bitmap(bmp);
+			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 7, TILE_SIDE * 5, 0, "Your Turn!");
+		}
+	}
 	if (graphicsError == G_NO_ERROR) {
 		al_flip_display();
 	}
@@ -462,11 +478,18 @@ void Graphics::displayActionInvalid() {
 	drawMap();
 	//al_draw_filled_rectangle((DISPLAY_WIDTH / 2) - 50, (DISPLAY_HEIGHT / 2) - 50, (DISPLAY_WIDTH / 2) + 50,
 	//	(DISPLAY_HEIGHT / 2) + 50, al_map_rgb(255, 255, 255));
-	string str = "./resources/pop-up.png";
-	ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
-	al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, DISPLAY_WIDTH / 4, DISPLAY_HEIGHT / 4, TILE_SIDE * 5, TILE_SIDE * 5, 0);
-	al_destroy_bitmap(bmp);
-	al_draw_text(font, al_map_rgb(0, 0, 0), (TILE_SIDE * 7)-10, TILE_SIDE * 5, 0, "Action Invalid!");
+	if (graphicsError == G_NO_ERROR) {
+		string str = "./resources/pop-up.png";
+		ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
+		if (bmp == NULL) {
+			graphicsError = G_LOAD_BITMAP_ERROR;
+		}
+		else {
+			al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, DISPLAY_WIDTH / 4, DISPLAY_HEIGHT / 4, TILE_SIDE * 5, TILE_SIDE * 5, 0);
+			al_destroy_bitmap(bmp);
+			al_draw_text(font, al_map_rgb(0, 0, 0), (TILE_SIDE * 7) - 10, TILE_SIDE * 5, 0, "Action Invalid!");
+		}
+	}
 	if (graphicsError == G_NO_ERROR) {
 		al_flip_display();
 	}
@@ -474,6 +497,31 @@ void Graphics::displayActionInvalid() {
 	drawMap();
 	if (graphicsError == G_NO_ERROR) {
 		al_flip_display();
+	}
+	return;
+}
+
+void Graphics::showDices(int yours, int enemys) {
+	drawMap();
+	if (graphicsError == G_NO_ERROR) {
+		al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 5, TILE_SIDE, 0, "The Dices Were:");
+		string str1, str2, str3, str;
+		str1 = std::to_string(yours);
+		str2 = std::to_string(enemys);
+		str = str1 + "   " + str2;
+		al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 7, TILE_SIDE * 2, 0, str.c_str());
+		if (yours > enemys) {
+			al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 6, TILE_SIDE * 3, 0, "You Win!");
+		}
+		else {
+			al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 6, TILE_SIDE * 3, 0, "You Lose :(");
+		}
+		al_flip_display();
+		timerMiliseconds(1000);
+		drawMap();
+		if (graphicsError == G_NO_ERROR) {
+			al_flip_display();
+		}
 	}
 	return;
 }
