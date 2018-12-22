@@ -7,8 +7,8 @@
 #define TILE_SIDE   50
 #define LEFT_CLICK  1
 #define OPTIONS_MENU_AMOUNT  10
-#define FONT_SIZE_SMALL		5
-#define FONT_SIZE_LARGE		20
+#define FONT_SIZE_SMALL		20
+#define FONT_SIZE_LARGE		40
 
 #define WIDTH_POPUP     100
 #define POPUP_LINE      15  
@@ -37,11 +37,12 @@ Graphics::Graphics(std::vector<MartusTerrains> newTerrainList,
 	al_register_event_source(this->evQueue, al_get_display_event_source(this->display));
 	al_init_primitives_addon();
 	al_init_font_addon();
-	font = al_load_font("resources/font.tga", FONT_SIZE_SMALL, 0); //VER SI ESTOS 2 CEROS ESTAN BIEN
+	al_init_ttf_addon();
+	font = al_load_font("resources/font.ttf", FONT_SIZE_SMALL, 0); //VER SI ESTOS 2 CEROS ESTAN BIEN
 	if (font == NULL) {
 		graphicsError = G_LOAD_FONT_ERROR;
 	}
-	fontLarge = al_load_font("resources/font.tga", FONT_SIZE_LARGE, 0);
+	fontLarge = al_load_ttf_font("resources/font.ttf", FONT_SIZE_LARGE, 0);
 	if (fontLarge == NULL) {
 		graphicsError = G_LOAD_FONT_ERROR;
 	}
@@ -61,6 +62,10 @@ Graphics::~Graphics() {
 	if (font != NULL) {
 		al_destroy_font(font);
 	}
+	al_shutdown_ttf_addon();
+	al_shutdown_font_addon();
+	al_shutdown_image_addon();
+	al_shutdown_primitives_addon();
     //disallocate memory
     return;
 }
@@ -135,8 +140,10 @@ void Graphics::drawTerrain(MartusTerrains terrainToDraw){
 #endif
 			ALLEGRO_BITMAP * bmp = al_load_bitmap(terrainToDraw.getImagePath().c_str());
 			if (bmp != NULL) {
-				al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
-					terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
+				//al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+				//	terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
+				al_draw_scaled_bitmap(bmp, 0, 0, 51, 58, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+					terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, TILE_SIDE, TILE_SIDE, 0);
 				al_destroy_bitmap(bmp);
 			}
 			else
@@ -156,8 +163,10 @@ void Graphics::drawBuilding(MartusBuildings buildingToDraw){
 #endif
 			ALLEGRO_BITMAP * bmp = al_load_bitmap(buildingToDraw.getImagePath().c_str());
 			if (bmp != NULL) {
-				al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
-					buildingToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
+				//al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+				//	buildingToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
+				al_draw_scaled_bitmap(bmp, 0, 0, 350, 350, buildingToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+					buildingToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, TILE_SIDE, TILE_SIDE, 0);
 				al_destroy_bitmap(bmp);
 			}
 			else
@@ -178,8 +187,10 @@ void Graphics::drawUnit(MartusUnidades unitToDraw){
 			ALLEGRO_BITMAP * bmp = al_load_bitmap(unitToDraw.getImagePath().c_str());
 
 			if (bmp != NULL) {
-				al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
-					unitToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
+				//al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+				//	unitToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
+				al_draw_scaled_bitmap(bmp, 0,0,51,58, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+					unitToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET,TILE_SIDE,TILE_SIDE,0);
 				al_destroy_bitmap(bmp);
 			}
 			else
@@ -417,7 +428,7 @@ void Graphics::showTransition() {
 }
 
 void Graphics::drawMessage() {
-	for (unsigned int i = 0; i < 5; i++) {
+	for (unsigned int i = 0; i < 2; i++) {
 		drawMap();
 		al_draw_filled_rectangle((DISPLAY_WIDTH / 2) - 50, (DISPLAY_HEIGHT / 2) - 50, (DISPLAY_WIDTH / 2) + 50,
 			(DISPLAY_HEIGHT / 2) + 50, al_map_rgb(255, 255, 255));
@@ -425,7 +436,7 @@ void Graphics::drawMessage() {
 		if (graphicsError == G_NO_ERROR) {
 			al_flip_display();
 		}
-		timerMiliseconds(1000);
+		timerMiliseconds(500);
 		drawMap();
 		if (graphicsError == G_NO_ERROR) {
 			al_flip_display();

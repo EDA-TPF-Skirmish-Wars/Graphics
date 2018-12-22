@@ -37,7 +37,7 @@ int main(void) {
 	tstMap.addBuilding(tstBuil);
 
 	Graphics tstGr(tstMap.getTerrains(), tstMap.getUnits(), tstMap.getBuildings());
-
+	tstGr.getUserAction();
 	getchar();
 	return 0;
 }
