@@ -124,6 +124,9 @@ private:
     action_s showPopUp(options_s opt, int xTile, int yTile); //Funciona perfecta
 	void drawMap();//Funciona perfecta
 	void drawMessage();//Funciona perfecta
+	string getBuildingImagePath(buildings_d typeBuild, int team);
+	string getTerrainImagePath(MartusTerrains terrain, std::vector<MartusTerrains> list);
+	string getUnitImagePath(units_d typeUnit, int team);
 
     ALLEGRO_DISPLAY * display = NULL;
     ALLEGRO_EVENT_QUEUE * evQueue = NULL;

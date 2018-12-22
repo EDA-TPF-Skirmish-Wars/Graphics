@@ -148,11 +148,12 @@ void Graphics::drawTerrain(MartusTerrains terrainToDraw){
 #ifdef FOW
 		if (terrainToDraw.getFog() == false) {
 #endif
-			ALLEGRO_BITMAP * bmp = al_load_bitmap(terrainToDraw.getImagePath().c_str());
+
+			ALLEGRO_BITMAP * bmp = al_load_bitmap(getTerrainImagePath(terrainToDraw, terrainList).c_str());
 			if (bmp != NULL) {
 				//al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
 				//	terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
-				al_draw_scaled_bitmap(bmp, 0, 0, 51, 58, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
+				al_draw_scaled_bitmap(bmp, 0, 0, 350,350, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
 					terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, TILE_SIDE, TILE_SIDE, 0);
 				al_destroy_bitmap(bmp);
 			}
@@ -171,7 +172,8 @@ void Graphics::drawBuilding(MartusBuildings buildingToDraw){
 #ifdef FOW
 		if (buildingToDraw.getFog() == false) {
 #endif
-			ALLEGRO_BITMAP * bmp = al_load_bitmap(buildingToDraw.getImagePath().c_str());
+			ALLEGRO_BITMAP * bmp = al_load_bitmap(getBuildingImagePath(buildingToDraw.getTypeOfBuilding(),
+				buildingToDraw.getTeam()).c_str());
 			if (bmp != NULL) {
 				//al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
 				//	buildingToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
@@ -194,7 +196,8 @@ void Graphics::drawUnit(MartusUnidades unitToDraw){
 #ifdef FOW
 		if (unitToDraw.getFog() == false) {
 #endif
-			ALLEGRO_BITMAP * bmp = al_load_bitmap(unitToDraw.getImagePath().c_str());
+			ALLEGRO_BITMAP * bmp = al_load_bitmap(getUnitImagePath(unitToDraw.getTypeOfUnit(),
+				unitToDraw.getTeam()).c_str());
 
 			if (bmp != NULL) {
 				//al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
@@ -524,4 +527,194 @@ void Graphics::showDices(int yours, int enemys) {
 		}
 	}
 	return;
+}
+
+string Graphics::getUnitImagePath(units_d typeOfUnit, int team) {
+	string answer;
+	switch (typeOfUnit) {
+	case UNIDAD_1:
+		answer = "./resources/Images/units/antiair_";
+		break;
+	case UNIDAD_2:
+		answer = "./resources/Images/units/apc_";
+		break;
+	case UNIDAD_3:
+		answer = "./resources/Images/units/artillery_";
+		break;
+	case UNIDAD_4:
+		answer = "./resources/Images/units/infantry_";
+		break;
+	case UNIDAD_5:
+		answer = "./resources/Images/units/mech_";
+		break;
+	case UNIDAD_6:
+		answer = "./resources/Images/units/medtank_";
+		break;
+	case UNIDAD_7:
+		answer = "./resources/Images/units/recon_";
+		break;
+	case UNIDAD_8:
+		answer = "./resources/Images/units/rocket_";
+		break;
+	case UNIDAD_9:
+		answer = "./resources/Images/units/tank_";
+		break;
+	default:
+		break;
+	}
+	switch (team) {
+	case TEAM_1:
+		answer = answer + "1.png";
+		break;
+	case TEAM_2:
+		answer = answer + "2.png";
+		break;
+	case TEAM_3:
+		answer = answer + "3.png";
+		break;
+	case TEAM_4:
+		answer = answer + "4.png";
+		break;
+	default:
+		answer.clear();
+		break;
+
+	}
+	return answer;
+}
+
+string Graphics::getBuildingImagePath(buildings_d typeOfBuild, int team) {
+	string answer;
+	switch (typeOfBuild) {
+	case EDIFICIO_1:
+		answer = "./resources/Images/building/city_";
+		break;
+	case EDIFICIO_2:
+		answer = "./resources/Images/building/factory_";
+		break;
+	case EDIFICIO_3:
+		answer = "./resources/Images/building/hq_";
+		break;
+	default:
+		break;
+	}
+	switch (team) {
+	case TEAM_1:
+		answer = answer + "1.png";
+		break;
+	case TEAM_2:
+		answer = answer + "2.png";
+		break;
+	case TEAM_3:
+		answer = answer + "3.png";
+		break;
+	case TEAM_4:
+		answer = answer + "4.png";
+		break;
+	case NO_TEAM:
+		answer = answer + "0.png";
+		break;
+	default:
+		answer.clear();
+		break;
+	}
+	return answer;
+}
+
+string Graphics::getTerrainImagePath(MartusTerrains terrain, std::vector<MartusTerrains> list) {
+	string answer;
+	if (terrain.getTypeOfTerrain() == TERRENO_1) {
+		answer = "./resources/Images/terrain/forest.png";
+	}
+	else if (terrain.getTypeOfTerrain() == TERRENO_2) {
+		answer = "./resources/Images/terrain/hill.png";
+	}
+	else if (terrain.getTypeOfTerrain() == TERRENO_3) {
+		answer = "./resources/Images/terrain/plain.png";
+	}
+	else if (terrain.getTypeOfTerrain() == TERRENO_4) { //RIO
+		answer = "./resources/Images/terrain/";
+		bool isThereOneUp, isThereOneDown, isThereOneLeft, isThereOneRight;
+		isThereOneUp = false;
+		isThereOneDown = false;
+		isThereOneLeft = false;
+		isThereOneRight = false;
+		for (unsigned int i = 0; i < list.size(); i++) {
+			if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y - 1) == terrain.getPosition().y &&
+				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
+				isThereOneUp = true;
+			}
+			else if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y + 1) == terrain.getPosition().y &&
+				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
+				isThereOneDown = true;
+			}
+			else if ((list[i].getPosition().x-1) == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y &&
+				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
+				isThereOneLeft = true;
+			}
+			else if ((list[i].getPosition().x +1) == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y &&
+				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
+				isThereOneRight = true;
+			}
+		}
+		answer = answer + "r_";
+		string str;
+		if (isThereOneUp) {
+			str = "u";
+		}
+		if (isThereOneLeft) {
+			str = str + "l";
+		}
+		if (isThereOneRight) {
+			str = str + "r";
+		}
+		if (isThereOneDown) {
+			str = str + "d";
+		}
+		str = str + ".png";
+		answer = answer + str;
+	}
+	else if (terrain.getTypeOfTerrain() == TERRENO_5) { //Camino
+		answer = "./resources/Images/terrain/";
+		bool isThereOneUp, isThereOneDown, isThereOneLeft, isThereOneRight;
+		isThereOneUp = false;
+		isThereOneDown = false;
+		isThereOneLeft = false;
+		isThereOneRight = false;
+		for (unsigned int i = 0; i < list.size(); i++) {
+			if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y - 1) == terrain.getPosition().y &&
+				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
+				isThereOneUp = true;
+			}
+			else if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y + 1) == terrain.getPosition().y &&
+				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
+				isThereOneDown = true;
+			}
+			else if ((list[i].getPosition().x - 1) == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y &&
+				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
+				isThereOneLeft = true;
+			}
+			else if ((list[i].getPosition().x + 1) == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y &&
+				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
+				isThereOneRight = true;
+			}
+		}
+		answer = answer + "c_";
+		string str;
+		if (isThereOneUp) {
+			str = "u";
+		}
+		if (isThereOneLeft) {
+			str = str + "l";
+		}
+		if (isThereOneRight) {
+			str = str + "r";
+		}
+		if (isThereOneDown) {
+			str = str + "d";
+		}
+		str = str + ".png";
+		answer = answer + str;
+	}
+	return answer;
 }

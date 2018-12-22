@@ -19,7 +19,10 @@ int main(void) {
 		for (int u = 0; u < 16; u++) {
 			pos.x = u;
 			pos.y = i;
-			tstTerr.setTerrain(TERRENO_3, pos, true);
+			if(u % 2 == 0 && i%2 == 0)
+				tstTerr.setTerrain(TERRENO_2, pos, true);
+			else
+				tstTerr.setTerrain(TERRENO_5, pos, true);
 			tstMap.addTerrain(tstTerr);
 		}
 	}
