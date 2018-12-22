@@ -33,6 +33,7 @@ typedef struct{
 class MartusUnidades
 {
 public:
+	void setUnit(units_d type, position_s pos, int team, bool fog);
     position_s getPosition();
     units_d getTypeOfUnit();
     string getImagePath();
@@ -51,6 +52,7 @@ private:
 class MartusTerrains
 {
 public:
+	void setTerrain(terrains_d type, position_s pos, bool fog);
     position_s getPosition();
     terrains_d getTypeOfTerrain();
     string getImagePath();
@@ -67,6 +69,7 @@ private:
 class MartusBuildings
 {
 public:
+	void setBuilding(buildings_d type, position_s pos, int team, bool fog);
     position_s getPosition();
     buildings_d getTypeOfBuilding();
     string getImagePath();
@@ -90,6 +93,9 @@ public:
     std::vector<MartusBuildings> getBuildings();
     std::vector<MartusTerrains> getTerrains();
     std::vector<MartusUnidades> getUnits();
+	void addTerrain(MartusTerrains newTerrain);
+	void addBuilding(MartusBuildings newBuilding);
+	void addUnit(MartusUnidades newUnit);
     bool isThereAUnitThere(int x, int y);
     bool isThereABuildingThere(int x, int y);
     options_s getOptions(int x , int y);

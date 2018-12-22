@@ -20,12 +20,10 @@
 #define GRAPHICS_H
 
 #define DEBUG
-#define FOW
+//#define FOW
 
 #include <iostream>
 #include <vector>
-#define TEAM1   0
-#define TEAM2   1
 
 #ifdef  DEBUG
     #include "./dummys/dummys.h"
@@ -47,11 +45,7 @@
 
 
 
-typedef struct{
-    act_s act;
-    position_s positionFrom;
-    position_s positionTo;
-}action_s;
+
 
 typedef enum {A_NO_ACTION, A_ATTACK, A_MOVE , A_PURCHASE, A_PASS ,A_CLOSE_GAME}act_s;
 
@@ -62,6 +56,12 @@ typedef struct{
     position_s positionTo;
     MartusUnidades unitType;
 }movement_s;
+
+typedef struct {
+	act_s act;
+	position_s positionFrom;
+	position_s positionTo;
+}action_s;
 
 
 
@@ -78,7 +78,7 @@ NO devuelve nada.
     ~Graphics();
     
     void setTeam(int team);
-/*Funcion de seteo del team del correspondiente jugador, se le debe pasar TEAM0 o TEAM1 como parametro y no devuelve nada.
+/*Funcion de seteo del team del correspondiente jugador, se le debe pasar TEAM_1, TEAM_2, TEAM_3 o TEAM_4 como parametro y no devuelve nada.
 Sirve para ver el color de tus propias unidades.
 */
     //introduction(); //poner algun presentacion al juego para hacerlo mas copado

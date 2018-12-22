@@ -17,31 +17,39 @@
 
 
 
-Graphics::Graphics(std::vector<MartusTerrains> newTerrainList, 
-                    std::vector<MartusUnidades> newUnitList, 
-                    std::vector<MartusBuildings> newBuildingList){
+Graphics::Graphics(std::vector<MartusTerrains> newTerrainList,
+	std::vector<MartusUnidades> newUnitList,
+	std::vector<MartusBuildings> newBuildingList) {
 	this->graphicsError = G_NO_ERROR;
-    this->terrainList = newTerrainList;
-    this->unitList = newUnitList;
-    this->buildingList = newBuildingList;
-    al_init_image_addon();
-    this->evQueue = al_create_event_queue();
-    al_register_event_source(this->evQueue,al_get_keyboard_event_source());
-    al_register_event_source(this->evQueue,al_get_mouse_event_source());
-    this->display = al_create_display(DISPLAY_WIDTH,DISPLAY_HEIGHT);
+	this->terrainList = newTerrainList;
+	this->unitList = newUnitList;
+	this->buildingList = newBuildingList;
+	al_init_image_addon();
+	this->evQueue = al_create_event_queue();
+	al_install_keyboard();
+	al_install_mouse();
+	al_register_event_source(this->evQueue, al_get_keyboard_event_source());
+	al_register_event_source(this->evQueue, al_get_mouse_event_source());
+	this->display = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 	if (display == NULL) {
 		graphicsError = G_DISPLAY_ERROR;
 	}
-    al_register_event_source(this->evQueue,al_get_display_event_source(this->display));
-    al_init_primitives_addon();
-    al_init_font_addon();
-    font = al_load_font("resources/font.tga",FONT_SIZE_SMALL,0); //VER SI ESTOS 2 CEROS ESTAN BIEN
+	al_register_event_source(this->evQueue, al_get_display_event_source(this->display));
+	al_init_primitives_addon();
+	al_init_font_addon();
+	font = al_load_font("resources/font.tga", FONT_SIZE_SMALL, 0); //VER SI ESTOS 2 CEROS ESTAN BIEN
 	if (font == NULL) {
 		graphicsError = G_LOAD_FONT_ERROR;
 	}
 	fontLarge = al_load_font("resources/font.tga", FONT_SIZE_LARGE, 0);
 	if (fontLarge == NULL) {
 		graphicsError = G_LOAD_FONT_ERROR;
+	}
+	if (graphicsError == G_NO_ERROR) {
+		drawMap();
+	}
+	if (graphicsError == G_NO_ERROR) {
+		al_flip_display();
 	}
     return;
 }
@@ -92,11 +100,11 @@ void Graphics::showLine(unsigned int line){
         if(this->terrainList[j].getPosition().x == line)
             terrainsInLine.push_back(this->terrainList[j]);
     }
-    for(unsigned int j=0 ; j <= this->buildingList.size() ; j++){
+    for(unsigned int j=0 ; j < this->buildingList.size() ; j++){
         if(this->buildingList[j].getPosition().x == line)
             buildingsInLine.push_back(this->buildingList[j]);
     }
-    for(unsigned int j=0 ; j <= this->unitList.size() ; j++){
+    for(unsigned int j=0 ; j < this->unitList.size() ; j++){
         if(this->unitList[j].getPosition().x == line)
             unitsInLine.push_back(this->unitList[j]);
     }
@@ -107,13 +115,13 @@ void Graphics::showLine(unsigned int line){
 
     //CREO Q HABRIA QUE IMPRIMIR TODA LA PANTALLA EN NEGRO ANTES DE VOLVER A DIBUJAR
 
-    for(unsigned int o = 0; o <= terrainsInLine.size(); o++){
+    for(unsigned int o = 0; o < terrainsInLine.size(); o++){
         this->drawTerrain(terrainsInLine[o]);
     }
-    for(unsigned int o = 0; o <= buildingsInLine.size(); o++){
+    for(unsigned int o = 0; o < buildingsInLine.size(); o++){
         this->drawBuilding(buildingsInLine[o]);
     }
-    for(unsigned int o = 0; o <= unitsInLine.size(); o++){
+    for(unsigned int o = 0; o < unitsInLine.size(); o++){
         this->drawUnit(unitsInLine[o]);
     }
 
