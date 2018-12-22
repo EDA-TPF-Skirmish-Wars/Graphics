@@ -2,6 +2,7 @@
 #define DUMMYS_H
 #include <iostream>
 #include <string>
+#include <vector>
 
 
 using namespace std;
@@ -9,7 +10,7 @@ using namespace std;
 typedef enum{UNIDAD_1,UNIDAD_2,UNIDAD_3,UNIDAD_4,UNIDAD_5,UNIDAD_6,UNIDAD_7,UNIDAD_8,UNIDAD_9}units_d;
 typedef enum{TERRENO_1,TERRENO_2,TERRENO_3,TERRENO_4,TERRENO_5,TERRENO_6}terrains_d;
 typedef enum{EDIFICIO_1,EDIFICIO_2,EDIFICIO_3,EDIFICIO_4,EDIFICIO_5}buildings_d;
-typedef enum{TEAM_1,TEAM_2,TEAM_3,TEAM_4}teams_d;
+typedef enum{TEAM_1,TEAM_2,TEAM_3,TEAM_4,NO_TEAM}teams_d;
 
 typedef struct{
     unsigned int x;
@@ -85,18 +86,27 @@ private:
 class MartusMap
 {
 public:
-    void updateFog();
+    //void updateFog();
     std::vector<MartusBuildings> getBuildings();
     std::vector<MartusTerrains> getTerrains();
     std::vector<MartusUnidades> getUnits();
     bool isThereAUnitThere(int x, int y);
     bool isThereABuildingThere(int x, int y);
     options_s getOptions(int x , int y);
+	int getTeam();
+	int getEnemyTeam();
+	void setTeam(int team);
+	void setEnemyTeam(int enemyTeam);
 protected:
+	bool isThereAnEnemyThere(int x,int y, int enemyTeam);
+	bool isThereAFriendUnitThere(int x, int y);
+	bool isThereAFriendBuildingThere(int x, int y);
     std::vector<MartusBuildings> buildings;
     std::vector<MartusTerrains> terrains;
     std::vector<MartusUnidades> units;
 private:
+	int team;
+	int enemyTeam;
 };
 
 #endif
