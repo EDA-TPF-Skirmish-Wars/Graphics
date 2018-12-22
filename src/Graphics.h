@@ -71,7 +71,7 @@ class Graphics
 public:
     Graphics(std::vector<MartusTerrains> newTerrainList, 
                 std::vector<MartusUnidades> newUnitList, 
-                std::vector<MartusBuildings> newBuildingList);
+                std::vector<MartusBuildings> newBuildingList);//Funciona perfecta
 /*Funcion de inicializacion de la clase, se le debe pasar 3 vectores uno con Terrenos, otro con unidades y
 el tercero con edificios.
 NO devuelve nada.
@@ -85,19 +85,21 @@ Sirve para ver el color de tus propias unidades.
     //introduction(); //poner algun presentacion al juego para hacerlo mas copado
 
     errors_s updateGraphics(std::vector<MartusUnidades> unitList,
-                            std::vector<MartusBuildings> buildingList);
+                            std::vector<MartusBuildings> buildingList); //Funciona perfecta
 /*  Esta funcion se la utiliza para actualizar los vectores de unidades y de edificios que fueron modificados por el
 jugador oponente. Se le pasa el nuevo vector de unidades, y el nuevo vector de edificios que actualiza el vector contenido
 dentro de esta clase. Y una vez actualizado grafica todas las lineas del mapa para que se vean en pantalla.
 Devuelve: un errors_s que estan especificados al principio de este archivo
 */
-    action_s getUserAction();
+    action_s getUserAction();//Funciona perfecta
 /*Funcion encargada de obtener los movimientos que haga el usuario. Recibe como parametro un callback
 al que se le pasara una accion y respondera true si esa accion es valida, o false si no lo es.
 Devuelve: una action_s
 */
 
 	errors_s getError();
+
+	void displayActionInvalid();//Funciona perfecta
 
 protected:
     std::vector<MartusUnidades> unitList;
@@ -106,26 +108,21 @@ protected:
     MartusMap map;
     int team;
 private:
-    void showLine(unsigned int i); //partially done
+    void showLine(unsigned int i); //Funciona perfecta
     //
     //Funcion encargada de dibujar en el display la linea numero i contando de arriba hacia abajo, es decir la linea
     // numero 0 es la linea horizontal superior y la linea numero 11  es la linea horizontal inferior.
     //
-    void drawTerrain(MartusTerrains terrainToDraw);//partially done
-    void drawBuilding(MartusBuildings buildingToDraw);//partially done
-    void drawUnit(MartusUnidades unitToDraw);//partially done
+    void drawTerrain(MartusTerrains terrainToDraw);//Funciona perfecta
+    void drawBuilding(MartusBuildings buildingToDraw);//Funciona perfecta
+    void drawUnit(MartusUnidades unitToDraw);//Funciona perfecta
     void showTransition();//not done
-    action_s getMouseAction(void);//partially done
-    action_s getKeyboardAction(int xTile, int yTile);//partially done
-    action_s showPopUp(options_s opt, int xTile, int yTile); //partially done
-	void drawMap();//done
-	void drawMessage();
+    action_s getMouseAction(void);//Funciona perfecta
+    action_s getKeyboardAction(int xTile, int yTile);//Funciona perfecta
+    action_s showPopUp(options_s opt, int xTile, int yTile); //Funciona perfecta
+	void drawMap();//Funciona perfecta
+	void drawMessage();//Funciona perfecta
 
-
-
-    std::vector<MartusUnidades> newUnitList;
-    std::vector<MartusBuildings> newBuildingList;
-    std::vector<MartusTerrains> newTerrainList;
     ALLEGRO_DISPLAY * display = NULL;
     ALLEGRO_EVENT_QUEUE * evQueue = NULL;
     ALLEGRO_FONT *font = NULL;

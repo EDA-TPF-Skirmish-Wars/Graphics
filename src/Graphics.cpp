@@ -1,6 +1,6 @@
 #include "./Graphics.h"
 #include "../Network/Timer.h"
-#define DISPLAY_WIDTH   800
+#define DISPLAY_WIDTH   1100
 #define DISPLAY_HEIGHT  600
 #define DISPLAY_WIDTH_OFFSET    0
 #define DISPLAY_HEIGHT_OFFSET    0
@@ -62,6 +62,9 @@ Graphics::~Graphics() {
 	if (font != NULL) {
 		al_destroy_font(font);
 	}
+	if (fontLarge != NULL) {
+		al_destroy_font(fontLarge);
+	}
 	al_shutdown_ttf_addon();
 	al_shutdown_font_addon();
 	al_shutdown_image_addon();
@@ -72,25 +75,30 @@ Graphics::~Graphics() {
 
 errors_s Graphics::updateGraphics(std::vector<MartusUnidades> newUnitList,
                                 std::vector<MartusBuildings> newBuildingList){
-    this->newUnitList = newUnitList;
-    this->newBuildingList = newBuildingList;
+    this->unitList = newUnitList;
+    this->buildingList = newBuildingList;
 	showTransition();
 	drawMap();
 	if (graphicsError == G_NO_ERROR) {
 		al_flip_display();
 	}
     //Update class variables, and freeing memory
-    this->unitList = newUnitList;
-    this->buildingList = newBuildingList;
-    this->newUnitList.clear();
-    this->newBuildingList.clear();
     return graphicsError;
 }
 
 void Graphics::drawMap() {
+	al_clear_to_color(al_map_rgb(0, 0, 0));
 	for (unsigned int u = 0; u < 12; u++) {
 		showLine(u);
 	}
+	string str = "./resources/frame.png";
+	ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
+	al_draw_scaled_bitmap(bmp, 68, 55, 994,1490, 0, 0, TILE_SIDE * 16, TILE_SIDE * 12, 0);
+	al_destroy_bitmap(bmp);
+	str = "./resources/pop-up.png";
+	bmp = al_load_bitmap(str.c_str());
+	al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, TILE_SIDE * 16, 0, TILE_SIDE * 6, TILE_SIDE *12 , 0);
+	al_destroy_bitmap(bmp);
 	return;
 }
 
@@ -101,16 +109,16 @@ void Graphics::showLine(unsigned int line){
     std::vector<MartusUnidades> unitsInLine;
 	
 	//Cargo los elementos encontrados en la linea en cada vector
-    for(unsigned int j=line*16 ; j < (line+1)*16 ; j++){
-        if(this->terrainList[j].getPosition().x == line)
+    for(unsigned int j=0 ; j < terrainList.size() ; j++){
+        if(this->terrainList[j].getPosition().y == line)
             terrainsInLine.push_back(this->terrainList[j]);
     }
     for(unsigned int j=0 ; j < this->buildingList.size() ; j++){
-        if(this->buildingList[j].getPosition().x == line)
+        if(this->buildingList[j].getPosition().y == line)
             buildingsInLine.push_back(this->buildingList[j]);
     }
     for(unsigned int j=0 ; j < this->unitList.size() ; j++){
-        if(this->unitList[j].getPosition().x == line)
+        if(this->unitList[j].getPosition().y == line)
             unitsInLine.push_back(this->unitList[j]);
     }
 
@@ -248,7 +256,8 @@ action_s Graphics::getMouseAction(){
 }
 
 action_s Graphics::showPopUp(options_s opt, int xTile, int yTile){
-    unsigned int amountOfLines = 0;
+	drawMap();
+	unsigned int amountOfLines = 0;
     if(opt.attackUpAvailable)
         amountOfLines++;
     else if(opt.attackDownAvailable)
@@ -269,53 +278,48 @@ action_s Graphics::showPopUp(options_s opt, int xTile, int yTile){
         amountOfLines++;
     else if(opt.passAvailable)
         amountOfLines++;
-    
-    int x,y;
-    al_get_mouse_cursor_position(&x,&y);
-    al_draw_filled_rectangle(x,y,x+WIDTH_POPUP, y+(POPUP_LINE*amountOfLines),al_map_rgb(255,255,255));
 
     amountOfLines = 1;
     if(opt.attackUpAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'W' to attack Up!");
+        al_draw_text(font,al_map_rgb(0,0,0),TILE_SIDE * 17,TILE_SIDE * (amountOfLines+1),0,"'W' to attack Up!");
         amountOfLines++;
     }
     else if(opt.attackDownAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'S' to attack Down!");
+        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"'S' to attack Down!");
         amountOfLines++;
     }
     else if(opt.attackRightAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'D' to attack Right!");
+        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"'D' to attack Right!");
         amountOfLines++;
     }
     else if(opt.attackLeftAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'A' to attack Left!");
+        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"'A' to attack Left!");
         amountOfLines++;
     }
     else if(opt.buyAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'B' to Buy!");
+        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"'B' to Buy!");
         amountOfLines++;
     }
     else if(opt.moveUpAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press Up Arrow to Move Up!");
+        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"Up Arrow to Move Up!");
         amountOfLines++;
     }
     else if(opt.moveDownAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press Down Arrow to Move Down!");
+        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"Down Arrow to Move Down!");
         amountOfLines++;
     }
     else if(opt.moveLeftAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press Left Arrow to Move Left!");
+        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"Left Arrow to Move Left!");
         amountOfLines++;
     }
     else if(opt.moveRightAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press Right Arrow to Move Right!");
+        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"Right Arrow to Move Right!");
         amountOfLines++;
     }
     else if(opt.passAvailable){
-        al_draw_text(font,al_map_rgb(0,0,0),x,y+POPUP_LINE*amountOfLines,0,"Press 'P' to Pass!");
+        al_draw_text(font,al_map_rgb(0,0,0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1),0,"'P' to Pass!");
         amountOfLines++;
     }
-
     al_flip_display();
 
     return getKeyboardAction(xTile,yTile);
@@ -416,9 +420,16 @@ errors_s Graphics::getError() {
 
 void Graphics::showTransition() {
 	if (graphicsError == G_NO_ERROR) {
+		for (unsigned int i = 0; i < 255; i--) {
+			al_clear_to_color(al_map_rgb(255-i, 255-i, 255-i));
+			al_draw_text(fontLarge, al_map_rgb(i, i,i), TILE_SIDE * 3, TILE_SIDE * 4, 0,
+				"Some changes have been happening during night!");
+			al_flip_display();
+			timerMiliseconds(10);
+		}
 		for (unsigned int i = 0; i < 255; i++) {
 			al_clear_to_color(al_map_rgb(i, i, i));
-			al_draw_text(fontLarge, al_map_rgb((255-i),(255-i), (255-i)), (DISPLAY_WIDTH/2), (DISPLAY_HEIGHT/2), 0, 
+			al_draw_text(fontLarge, al_map_rgb((255-i),(255-i), (255-i)), TILE_SIDE * 3, TILE_SIDE*4, 0, 
 				"Some changes have been happening during night!");
 			al_flip_display();
 			timerMiliseconds(10);
@@ -428,19 +439,41 @@ void Graphics::showTransition() {
 }
 
 void Graphics::drawMessage() {
-	for (unsigned int i = 0; i < 2; i++) {
-		drawMap();
-		al_draw_filled_rectangle((DISPLAY_WIDTH / 2) - 50, (DISPLAY_HEIGHT / 2) - 50, (DISPLAY_WIDTH / 2) + 50,
-			(DISPLAY_HEIGHT / 2) + 50, al_map_rgb(255, 255, 255));
-		al_draw_text(font, al_map_rgb(0, 0, 0), (DISPLAY_WIDTH / 2), (DISPLAY_HEIGHT / 2), 0, "Your Turn!");
-		if (graphicsError == G_NO_ERROR) {
-			al_flip_display();
-		}
-		timerMiliseconds(500);
-		drawMap();
-		if (graphicsError == G_NO_ERROR) {
-			al_flip_display();
-		}
+	drawMap();
+	//al_draw_filled_rectangle((DISPLAY_WIDTH / 2) - 50, (DISPLAY_HEIGHT / 2) - 50, (DISPLAY_WIDTH / 2) + 50,
+	//	(DISPLAY_HEIGHT / 2) + 50, al_map_rgb(255, 255, 255));
+	string str = "./resources/pop-up.png";
+	ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
+	al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, DISPLAY_WIDTH/4,DISPLAY_HEIGHT/4, TILE_SIDE * 5, TILE_SIDE*5, 0);
+	al_destroy_bitmap(bmp);
+	al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE*7, TILE_SIDE * 5, 0, "Your Turn!");
+	if (graphicsError == G_NO_ERROR) {
+		al_flip_display();
+	}
+	timerMiliseconds(1000);
+	drawMap();
+	if (graphicsError == G_NO_ERROR) {
+		al_flip_display();
+	}
+	return;
+}
+
+void Graphics::displayActionInvalid() {
+	drawMap();
+	//al_draw_filled_rectangle((DISPLAY_WIDTH / 2) - 50, (DISPLAY_HEIGHT / 2) - 50, (DISPLAY_WIDTH / 2) + 50,
+	//	(DISPLAY_HEIGHT / 2) + 50, al_map_rgb(255, 255, 255));
+	string str = "./resources/pop-up.png";
+	ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
+	al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, DISPLAY_WIDTH / 4, DISPLAY_HEIGHT / 4, TILE_SIDE * 5, TILE_SIDE * 5, 0);
+	al_destroy_bitmap(bmp);
+	al_draw_text(font, al_map_rgb(0, 0, 0), (TILE_SIDE * 7)-10, TILE_SIDE * 5, 0, "Action Invalid!");
+	if (graphicsError == G_NO_ERROR) {
+		al_flip_display();
+	}
+	timerMiliseconds(2000);
+	drawMap();
+	if (graphicsError == G_NO_ERROR) {
+		al_flip_display();
 	}
 	return;
 }
