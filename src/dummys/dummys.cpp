@@ -409,14 +409,14 @@ options_s MartusMap::getOptions(int x, int y) {
 bool MartusMap::isThereAnEnemyThere(int x, int y, int enemyTeam) {
 	bool exit = false;
 
-	for (unsigned int i = 0; i <= units.size(); i++) {
+	for (unsigned int i = 0; i < units.size(); i++) {
 		if (units[i].getPosition().x == x && units[i].getPosition().y == y) {
 			if (units[i].getTeam() == enemyTeam) {
 				exit = true;
 			}
 		}
 	}
-	for (unsigned int i = 0; i <= buildings.size(); i++) {
+	for (unsigned int i = 0; i < buildings.size(); i++) {
 		if (buildings[i].getPosition().x == x && buildings[i].getPosition().y == y) {
 			if (buildings[i].getTeam() == enemyTeam) {
 				exit = true;
@@ -428,7 +428,7 @@ bool MartusMap::isThereAnEnemyThere(int x, int y, int enemyTeam) {
 
 bool MartusMap::isThereAFriendUnitThere(int x, int y) {
 	bool answer = false;
-	for (unsigned int i = 0; i <= units.size(); i++) {
+	for (unsigned int i = 0; i < units.size(); i++) {
 		if (units[i].getPosition().x == x && units[i].getPosition().y == y) {
 			if (units[i].getTeam() == this->getTeam()) {
 				answer = true;
@@ -440,7 +440,7 @@ bool MartusMap::isThereAFriendUnitThere(int x, int y) {
 
 bool MartusMap::isThereAFriendBuildingThere(int x, int y) {
 	bool answer = false;
-	for (unsigned int i = 0; i <= buildings.size(); i++) {
+	for (unsigned int i = 0; i < buildings.size(); i++) {
 		if (buildings[i].getPosition().x == x && buildings[i].getPosition().y == y) {
 			if (buildings[i].getTeam() == this->getTeam()) {
 				answer = true;
