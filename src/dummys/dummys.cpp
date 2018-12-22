@@ -17,7 +17,7 @@ units_d MartusUnidades::getTypeOfUnit() {
 	return typeOfUnit;
 }
 
-string MartusUnidades::getImagePath() {
+/*string MartusUnidades::getImagePath() {
 	string answer;
 	if (team == TEAM_3) {
 		switch (typeOfUnit) {
@@ -152,7 +152,7 @@ string MartusUnidades::getImagePath() {
 		}
 	}
 	return answer;
-}
+}*/
 
 int MartusUnidades::getTeam() {
 	return team;
@@ -182,7 +182,7 @@ terrains_d MartusTerrains::getTypeOfTerrain() {
 	return typeOfTerrain;
 }
 
-string MartusTerrains::getImagePath() {
+/*string MartusTerrains::getImagePath() {
 	string answer;
 	switch (typeOfTerrain) {
 	case TERRENO_1:
@@ -204,7 +204,7 @@ string MartusTerrains::getImagePath() {
 		break;
 	}
 	return answer;
-}
+}*/
 
 bool MartusTerrains::getFog() {
 	return fog;
@@ -230,7 +230,7 @@ buildings_d MartusBuildings::getTypeOfBuilding() {
 	return typeOfBuilding;
 }
 
-string MartusBuildings::getImagePath() {
+/*string MartusBuildings::getImagePath() {
 	string answer;
 	if (buildingIsFree) {
 		if (team == TEAM_3) {
@@ -307,7 +307,7 @@ string MartusBuildings::getImagePath() {
 		}
 	}
 	return answer;
-}
+}*/
 
 int MartusBuildings::getTeam() {
 	return team;

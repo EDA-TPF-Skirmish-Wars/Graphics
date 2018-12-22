@@ -36,7 +36,7 @@ public:
 	void setUnit(units_d type, position_s pos, int team, bool fog);
     position_s getPosition();
     units_d getTypeOfUnit();
-    string getImagePath();
+    //string getImagePath();
     int getTeam();
     bool getFog();
     void setFogOn();
@@ -55,7 +55,7 @@ public:
 	void setTerrain(terrains_d type, position_s pos, bool fog);
     position_s getPosition();
     terrains_d getTypeOfTerrain();
-    string getImagePath();
+    //string getImagePath();
     bool getFog();
     void setFogOn();
 protected:
@@ -72,7 +72,7 @@ public:
 	void setBuilding(buildings_d type, position_s pos, int team, bool fog);
     position_s getPosition();
     buildings_d getTypeOfBuilding();
-    string getImagePath();
+    //string getImagePath();
     int getTeam();
     bool getFog();
     void setFogOn();
