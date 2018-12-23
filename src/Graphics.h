@@ -18,12 +18,11 @@
 
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
-
-#define DEBUG
 //#define FOW
 
 #include <iostream>
 #include <vector>
+#define DEBUG
 
 #ifdef  DEBUG
     #include "./dummys/dummys.h"
@@ -42,6 +41,8 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #endif
 
 
@@ -50,7 +51,7 @@
 
 typedef enum {A_NO_ACTION, A_ATTACK, A_MOVE , A_PURCHASE, A_PASS ,A_CLOSE_GAME}act_s;
 
-typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR, G_DISPLAY_ERROR, G_LOAD_FONT_ERROR, G_GAME_CLOSED}errors_s;
+typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR, G_DISPLAY_ERROR, G_LOAD_FONT_ERROR, G_GAME_CLOSED, G_AUDIO_ERROR}errors_s;
 
 typedef struct{
     position_s positionFrom;
@@ -70,60 +71,69 @@ class Graphics
 {
 public:
 	Graphics(MartusMap map);//Funciona perfecta
-/*Funcion de inicializacion de la clase, se le debe pasar 3 vectores uno con Terrenos, otro con unidades y
-el tercero con edificios.
+/*Funcion de inicializacion de la clase, se le debe pasar un mapa con edificios, terrenos y unidades cargados
 NO devuelve nada.
 */
     ~Graphics();//Funciona perfecta
     
     //introduction(); //poner algun presentacion al juego para hacerlo mas copado
 
-    errors_s updateGraphics(std::vector<MartusUnidades> unitList,
-                            std::vector<MartusBuildings> buildingList); //Funciona perfecta
+    errors_s updateGraphics(MartusMap newMap); //Funciona perfecta
 /*  Esta funcion se la utiliza para actualizar los vectores de unidades y de edificios que fueron modificados por el
-jugador oponente. Se le pasa el nuevo vector de unidades, y el nuevo vector de edificios que actualiza el vector contenido
+jugador oponente. Se le pasa el nuevo mapa, con los nuevos vectores de unidades y edificios que actualiza el vector contenido
 dentro de esta clase. Y una vez actualizado grafica todas las lineas del mapa para que se vean en pantalla.
 Devuelve: un errors_s que estan especificados al principio de este archivo
 */
     action_s getUserAction();//Funciona perfecta
-/*Funcion encargada de obtener los movimientos que haga el usuario. Recibe como parametro un callback
-al que se le pasara una accion y respondera true si esa accion es valida, o false si no lo es.
+/*Funcion encargada de obtener los movimientos que haga el usuario.
 Devuelve: una action_s
 */
 
 	errors_s getError();
+	/*Funcion encargada de devolver un error_s, en caso de devolver algo distinto a G_NO_ERROR, se debe proceder a cerrar el juego
+	ya que hubo un error que no pudo ser resuelto dentro de la parte grafica. Si se quiere saber que tipo de error ocurrio, se tiene
+	que mirar el valor de la respuesta de la funcion ya que especifica ue tipo de error ocurrio.
+	*/
 
 	void displayActionInvalid();//Funciona perfecta
+	/*Funcion encargada de mostrar un POP-UP que dice "Accion Invalida", sirve para cuando el usuario toca una accion la cual no esta
+	permitida por las reglas del juego. Es bloqueante.
+	*/
 
 	void showDices(int yours, int enemys);//Funciona perfecta
+	/*Funcion encargada de mostrar el resultado de los dados obtenido en alguna parte del juego, es bloqueante.
+	*/
 
 protected:
     MartusMap map;
 private:
     void showLine(unsigned int i); //Funciona perfecta
-    //
-    //Funcion encargada de dibujar en el display la linea numero i contando de arriba hacia abajo, es decir la linea
-    // numero 0 es la linea horizontal superior y la linea numero 11  es la linea horizontal inferior.
-    //
+	/*Funcion encargada de dibujar en el display la linea numero i contando de arriba hacia abajo, es decir la linea
+	numero 0 es la linea horizontal superior y la linea numero 11  es la linea horizontal inferior.*/
     void drawTerrain(MartusTerrains terrainToDraw);//Funciona perfecta
     void drawBuilding(MartusBuildings buildingToDraw);//Funciona perfecta
     void drawUnit(MartusUnidades unitToDraw);//Funciona perfecta
-    void showTransition();//not done
+    void showTransition();//Funciona perfecta
     action_s getMouseAction(void);//Funciona perfecta
     action_s getKeyboardAction(int xTile, int yTile);//Funciona perfecta
     action_s showPopUp(options_s opt, int xTile, int yTile); //Funciona perfecta
-	void drawMap();//Funciona perfecta
+	void drawMap();//Funciona perfecta, un poco lenta
 	void drawMessage();//Funciona perfecta
-	string getBuildingImagePath(int typeBuild, int team);
-	string getTerrainImagePath(MartusTerrains terrain, std::vector<MartusTerrains> list);
-	string getUnitImagePath(int typeUnit, int team);
-	void reDrawSide();
+	string getBuildingImagePath(int typeBuild, int team);//Funciona perfecta
+	string getTerrainImagePath(MartusTerrains terrain, std::vector<MartusTerrains> list);//Funciona perfecta
+	string getUnitImagePath(int typeUnit, int team);//Funciona perfecta
+	void reDrawSide();//Funciona perfecta
+	void introduction();
 
     ALLEGRO_DISPLAY * display = NULL;
     ALLEGRO_EVENT_QUEUE * evQueue = NULL;
     ALLEGRO_FONT *font = NULL;
 	ALLEGRO_FONT *fontLarge = NULL;
 	errors_s graphicsError;
+	ALLEGRO_SAMPLE_INSTANCE *sample = NULL;
+	ALLEGRO_SAMPLE * sample_data = NULL;
+	ALLEGRO_VOICE *voice;
+	ALLEGRO_MIXER *mixer;
 };
 
 #endif

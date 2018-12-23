@@ -7,11 +7,15 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <Windows.h>
 
+#ifndef DEBUG
+#include <Windows.h>
+#endif // DEBUG
 
 int main(void) {
+#ifndef DEBUG
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif // !DEBUG
 	srand(time(NULL));
 	if (!al_init()) {
 		printf("Could Not Init Alegro\n");
@@ -75,7 +79,7 @@ int main(void) {
 	pos.y = 9;
 	tstUnit.setUnit(ARTILLERY, pos, TEAM_YELLOW, true);
 	tstMap.addUnit(tstUnit);
-	tstGr.updateGraphics(tstMap.getUnits(),tstMap.getBuildings());
+	tstGr.updateGraphics(tstMap);
 	tstGr.getUserAction();
 	tstGr.showDices((rand()%6)+1, (rand()%6)+1);
 	return 0;

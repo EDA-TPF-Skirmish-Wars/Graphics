@@ -19,24 +19,55 @@
 
 Graphics::Graphics(MartusMap map) {
 	this->graphicsError = G_NO_ERROR;
-	//this->terrainList = newTerrainList;
-	//this->unitList = newUnitList;
-	//this->buildingList = newBuildingList;
 	this->map = map;
-	al_init_image_addon();
-	this->evQueue = al_create_event_queue();
-	al_install_keyboard();
-	al_install_mouse();
-	al_register_event_source(this->evQueue, al_get_keyboard_event_source());
-	al_register_event_source(this->evQueue, al_get_mouse_event_source());
 	this->display = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 	if (display == NULL) {
 		graphicsError = G_DISPLAY_ERROR;
 	}
+	this->evQueue = al_create_event_queue();
+	al_init_image_addon();
+	al_install_keyboard();
+	al_install_mouse();
+	al_register_event_source(this->evQueue, al_get_keyboard_event_source());
+	al_register_event_source(this->evQueue, al_get_mouse_event_source());
 	al_register_event_source(this->evQueue, al_get_display_event_source(this->display));
 	al_init_primitives_addon();
 	al_init_font_addon();
 	al_init_ttf_addon();
+	if (!al_install_audio()) {
+		graphicsError = G_AUDIO_ERROR;
+	}
+	if (!al_init_acodec_addon()) {
+		graphicsError = G_AUDIO_ERROR;
+	}
+	voice = al_create_voice(44100, ALLEGRO_AUDIO_DEPTH_INT16, ALLEGRO_CHANNEL_CONF_2);
+	if (voice == NULL) {
+		graphicsError = G_AUDIO_ERROR;
+	}
+	mixer = al_create_mixer(44100, ALLEGRO_AUDIO_DEPTH_FLOAT32, ALLEGRO_CHANNEL_CONF_2);
+	if (mixer == NULL) {
+		graphicsError = G_AUDIO_ERROR;
+	}
+	if (!al_attach_mixer_to_voice(mixer, voice)) {
+		graphicsError = G_AUDIO_ERROR;
+	}
+	sample = al_create_sample_instance(NULL);
+	if (sample == NULL) {
+		graphicsError = G_AUDIO_ERROR;
+	}
+	sample_data = al_load_sample("./resources/music.ogg");
+	if (sample_data == NULL) {
+		graphicsError = G_AUDIO_ERROR;
+	}
+	if (!al_set_sample(sample, sample_data)) {
+		graphicsError = G_AUDIO_ERROR;
+	}
+	if (!al_attach_sample_instance_to_mixer(sample, mixer)) {
+		graphicsError = G_AUDIO_ERROR;
+	}
+	al_set_sample_instance_playmode(sample, ALLEGRO_PLAYMODE_LOOP);
+	al_play_sample_instance(sample);
+
 	font = al_load_font("resources/font.ttf", FONT_SIZE_SMALL, 0); //VER SI ESTOS 2 CEROS ESTAN BIEN
 	if (font == NULL) {
 		graphicsError = G_LOAD_FONT_ERROR;
@@ -45,6 +76,7 @@ Graphics::Graphics(MartusMap map) {
 	if (fontLarge == NULL) {
 		graphicsError = G_LOAD_FONT_ERROR;
 	}
+	introduction();
 	if (graphicsError == G_NO_ERROR) {
 		drawMap();
 	}
@@ -64,6 +96,15 @@ Graphics::~Graphics() {
 	if (fontLarge != NULL) {
 		al_destroy_font(fontLarge);
 	}
+	if (evQueue != NULL) {
+		al_destroy_event_queue(evQueue);
+	}
+	al_set_sample(sample, NULL);
+	al_destroy_sample(sample_data);
+	al_destroy_sample_instance(sample);
+	al_destroy_mixer(mixer);
+	al_destroy_voice(voice);
+	al_uninstall_audio();
 	al_shutdown_ttf_addon();
 	al_shutdown_font_addon();
 	al_shutdown_image_addon();
@@ -72,10 +113,8 @@ Graphics::~Graphics() {
     return;
 }
 
-errors_s Graphics::updateGraphics(std::vector<MartusUnidades> newUnitList,
-                                std::vector<MartusBuildings> newBuildingList){
-    this->map.setUnits(newUnitList);
-    this->map.setBuildings(newBuildingList);
+errors_s Graphics::updateGraphics(MartusMap newMap){
+	this->map = newMap;
 	showTransition();
 	drawMap();
 	if (graphicsError == G_NO_ERROR) {
@@ -120,11 +159,8 @@ void Graphics::showLine(unsigned int line){
             unitsInLine.push_back(this->map.getUnits()[j]);
     }
 
-    //FALTA HACER LA TRANSICION ENTRE MOVIMIENTOS PARA QUE EL JUEGO SE VEA MAS FLUIDO
     //tengo cargado en las listas los elementos de la fila correspodiente
     //dibujo cada elemento en su correspondiente lugar
-
-    //CREO Q HABRIA QUE IMPRIMIR TODA LA PANTALLA EN NEGRO ANTES DE VOLVER A DIBUJAR
 
     for(unsigned int o = 0; o < terrainsInLine.size(); o++){
         this->drawTerrain(terrainsInLine[o]);
@@ -147,8 +183,6 @@ void Graphics::drawTerrain(MartusTerrains terrainToDraw){
 
 			ALLEGRO_BITMAP * bmp = al_load_bitmap(getTerrainImagePath(terrainToDraw, map.getTerrains()).c_str());
 			if (bmp != NULL) {
-				//al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
-				//	terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
 				al_draw_scaled_bitmap(bmp, 0, 0, 350,350, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
 					terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, TILE_SIDE, TILE_SIDE, 0);
 				al_destroy_bitmap(bmp);
@@ -163,16 +197,13 @@ void Graphics::drawTerrain(MartusTerrains terrainToDraw){
 }
 
 void Graphics::drawBuilding(MartusBuildings buildingToDraw){
-    //errors_s error = G_NO_ERROR;
 	if (graphicsError == G_NO_ERROR) {
 #ifdef FOW
-		if (buildingToDraw.getFog() == false) {
+		if (buildingToDraw.getFog() == false || buildingToDraw.getTeam() == map.getTeam()) {
 #endif
 			ALLEGRO_BITMAP * bmp = al_load_bitmap(getBuildingImagePath(buildingToDraw.getTypeOfBuilding(),
 				buildingToDraw.getTeam()).c_str());
 			if (bmp != NULL) {
-				//al_draw_bitmap(bmp, buildingToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
-				//	buildingToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
 				al_draw_scaled_bitmap(bmp, 0, 0, 350, 350, buildingToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
 					buildingToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, TILE_SIDE, TILE_SIDE, 0);
 				al_destroy_bitmap(bmp);
@@ -187,17 +218,14 @@ void Graphics::drawBuilding(MartusBuildings buildingToDraw){
 }
 
 void Graphics::drawUnit(MartusUnidades unitToDraw){
-    //errors_s error = G_NO_ERROR;
 	if (graphicsError == G_NO_ERROR) {
 #ifdef FOW
-		if (unitToDraw.getFog() == false) {
+		if (unitToDraw.getFog() == false || unitToDraw.getTeam() == map.getTeam()) {
 #endif
 			ALLEGRO_BITMAP * bmp = al_load_bitmap(getUnitImagePath(unitToDraw.getTypeOfUnit(),
 				unitToDraw.getTeam()).c_str());
 
 			if (bmp != NULL) {
-				//al_draw_bitmap(bmp, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
-				//	unitToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
 				al_draw_scaled_bitmap(bmp, 0,0,105,105, unitToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET, //51,58
 					unitToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET,TILE_SIDE,TILE_SIDE,0);
 				al_destroy_bitmap(bmp);
@@ -398,13 +426,14 @@ errors_s Graphics::getError() {
 
 void Graphics::showTransition() {
 	if (graphicsError == G_NO_ERROR) {
-		for (unsigned int i = 0; i < 255; i--) {
-			al_clear_to_color(al_map_rgb(255-i, 255-i, 255-i));
-			al_draw_text(fontLarge, al_map_rgb(i, i,i), TILE_SIDE * 3, TILE_SIDE * 4, 0,
+		for (unsigned int i = 255; i > 0; i--) {
+			al_clear_to_color(al_map_rgb(i, i, i));
+			al_draw_text(fontLarge, al_map_rgb((255 - i), (255 - i), (255 - i)), TILE_SIDE * 3, TILE_SIDE * 4, 0,
 				"Some changes have been happening during night!");
 			al_flip_display();
-			timerMiliseconds(100);
+			timerMiliseconds(10);
 		}
+		timerMiliseconds(10);
 		for (unsigned int i = 0; i < 255; i++) {
 			al_clear_to_color(al_map_rgb(i, i, i));
 			al_draw_text(fontLarge, al_map_rgb((255-i),(255-i), (255-i)), TILE_SIDE * 3, TILE_SIDE*4, 0, 
@@ -417,7 +446,6 @@ void Graphics::showTransition() {
 }
 
 void Graphics::drawMessage() {
-	//drawMap();
 	if (graphicsError == G_NO_ERROR) {
 		reDrawSide();
 		al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17 , TILE_SIDE * 2, 0, "Your Turn!");
@@ -427,9 +455,6 @@ void Graphics::drawMessage() {
 }
 
 void Graphics::displayActionInvalid() {
-	//drawMap();
-	//al_draw_filled_rectangle((DISPLAY_WIDTH / 2) - 50, (DISPLAY_HEIGHT / 2) - 50, (DISPLAY_WIDTH / 2) + 50,
-	//	(DISPLAY_HEIGHT / 2) + 50, al_map_rgb(255, 255, 255));
 	if (graphicsError == G_NO_ERROR) {
 		string str = "./resources/pop-up.png";
 		ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
@@ -444,7 +469,7 @@ void Graphics::displayActionInvalid() {
 	}
 	if (graphicsError == G_NO_ERROR) {
 		al_flip_display();
-		timerMiliseconds(2000);
+		timerMiliseconds(1000);
 	}
 	drawMap();
 	if (graphicsError == G_NO_ERROR) {
@@ -454,7 +479,6 @@ void Graphics::displayActionInvalid() {
 }
 
 void Graphics::showDices(int yours, int enemys) {
-	//drawMap();
 	if (graphicsError == G_NO_ERROR) {
 		al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 5, TILE_SIDE, 0, "The Dices Were:");
 		string str1, str2, str3, str;
@@ -673,5 +697,52 @@ void Graphics::reDrawSide() {
 	ALLEGRO_BITMAP *bmp = al_load_bitmap(str.c_str());
 	al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, TILE_SIDE * 16, -24, TILE_SIDE * 6.6, TILE_SIDE *13.5, 0);
 	al_destroy_bitmap(bmp);
+	return;
+}
+
+void Graphics::introduction() {
+	if (graphicsError == G_NO_ERROR) {
+		ALLEGRO_BITMAP * bmp = al_load_bitmap("./resources/banner.png");
+		if (bmp != NULL) {
+			//timerMiliseconds(1000);
+			for (int i = 0; i < DISPLAY_HEIGHT; i++) {
+				al_clear_to_color(al_map_rgb(0, 0, 0));
+				al_draw_scaled_bitmap(bmp, 0, 0, 1000, 500, 0, DISPLAY_HEIGHT - i, DISPLAY_WIDTH,DISPLAY_HEIGHT *2 -i, 0);
+				if (graphicsError == G_NO_ERROR) {
+					al_flip_display();
+				}
+				timerMiliseconds(10);
+			}
+			al_destroy_bitmap(bmp);
+		}
+		else {
+			graphicsError = G_LOAD_BITMAP_ERROR;
+		}
+		bmp = al_load_bitmap("./resources/pressstart.png");
+		if (bmp != NULL && graphicsError == G_NO_ERROR) {
+			al_draw_bitmap(bmp, TILE_SIDE * 4, TILE_SIDE * 8,0);
+			if (graphicsError == G_NO_ERROR) {
+				al_flip_display();
+			}
+			al_destroy_bitmap(bmp);
+		}
+		else {
+			graphicsError = G_LOAD_BITMAP_ERROR;
+		}
+		ALLEGRO_EVENT ev;
+		bool tmp = false;
+		while (!tmp) {
+			al_wait_for_event(evQueue, &ev);
+			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || ev.type == ALLEGRO_EVENT_KEY_DOWN
+				|| ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+				tmp = true;
+			}
+		}
+		al_clear_to_color(al_map_rgb(0, 0, 0));
+		al_flip_display();
+		if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+			graphicsError = G_GAME_CLOSED;
+		}
+	}
 	return;
 }
