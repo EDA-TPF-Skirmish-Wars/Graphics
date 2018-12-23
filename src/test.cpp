@@ -4,8 +4,15 @@
 #include "./Graphics.h"
 #include "./dummys/dummys.h"
 #include <allegro5/allegro.h>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <Windows.h>
+
 
 int main(void) {
+	ShowWindow(GetConsoleWindow(), SW_HIDE);
+	srand(time(NULL));
 	if (!al_init()) {
 		printf("Could Not Init Alegro\n");
 		return -1;
@@ -19,37 +26,57 @@ int main(void) {
 		for (int u = 0; u < 16; u++) {
 			pos.x = u;
 			pos.y = i;
-			if(u % 2 == 0 && i%2 == 0)
-				tstTerr.setTerrain(TERRENO_2, pos, true);
-			else
-				tstTerr.setTerrain(TERRENO_5, pos, true);
+			int a = rand() % 5;
+			switch (a) {
+			case 0:
+				tstTerr.setTerrain(FOREST, pos, true);
+				break;
+			case 1:
+				tstTerr.setTerrain(HILL, pos, true);
+				break;
+			case 2:
+				tstTerr.setTerrain(PLAIN, pos, true);
+				break;
+			case 3:
+				tstTerr.setTerrain(RIVER, pos, true);
+				break;
+			case 4:
+				tstTerr.setTerrain(STREET, pos, true);
+				break;
+			default: 
+				tstTerr.setTerrain(STREET, pos, true);
+				break;
+			}
 			tstMap.addTerrain(tstTerr);
 		}
 	}
-	tstMap.setTeam(TEAM_2);
+	tstMap.setTeam(TEAM_BLUE);
 
-	pos.x = 0;
-	pos.y = 0;
-	tstUnit.setUnit(UNIDAD_4, pos, TEAM_1, true);
-	tstMap.addUnit(tstUnit);
-	pos.x = 5;
-	pos.y = 4;
-	tstUnit.setUnit(UNIDAD_4, pos, TEAM_2, true);
-	tstMap.addUnit(tstUnit);
-	pos.x = 0;
-	pos.y = 11;
-	tstBuil.setBuilding(EDIFICIO_1, pos, TEAM_3, true);
-	tstMap.addBuilding(tstBuil);
+	for (int i = 0; i < rand() % 30; i++) {
+		pos.x = rand() % 16;
+		pos.y = rand() % 12;
+		int a = rand() % 9;
+		int b = rand() % 4;
+		tstUnit.setUnit(a, pos, b, true);
+		tstMap.addUnit(tstUnit);
+	}
 
-	Graphics tstGr(tstMap.getTerrains(), tstMap.getUnits(), tstMap.getBuildings());
+	for (int u = 0; u < rand() % 15; u++) {
+		pos.x = rand() % 16;
+		pos.y = rand() % 12;
+		int a = rand() % 3;
+		int b = rand() % 5;
+		tstBuil.setBuilding(a, pos, TEAM_GREEN, true);
+		tstMap.addBuilding(tstBuil);
+	}
+	Graphics tstGr(tstMap);
 	tstGr.getUserAction();
-	tstGr.displayActionInvalid();
 	pos.x = 7;
 	pos.y = 9;
-	tstUnit.setUnit(UNIDAD_2, pos, TEAM_4, true);
+	tstUnit.setUnit(ARTILLERY, pos, TEAM_YELLOW, true);
 	tstMap.addUnit(tstUnit);
 	tstGr.updateGraphics(tstMap.getUnits(),tstMap.getBuildings());
 	tstGr.getUserAction();
-	tstGr.showDices(13, 5);
+	tstGr.showDices((rand()%6)+1, (rand()%6)+1);
 	return 0;
 }

@@ -17,13 +17,12 @@
 
 
 
-Graphics::Graphics(std::vector<MartusTerrains> newTerrainList,
-	std::vector<MartusUnidades> newUnitList,
-	std::vector<MartusBuildings> newBuildingList) {
+Graphics::Graphics(MartusMap map) {
 	this->graphicsError = G_NO_ERROR;
-	this->terrainList = newTerrainList;
-	this->unitList = newUnitList;
-	this->buildingList = newBuildingList;
+	//this->terrainList = newTerrainList;
+	//this->unitList = newUnitList;
+	//this->buildingList = newBuildingList;
+	this->map = map;
 	al_init_image_addon();
 	this->evQueue = al_create_event_queue();
 	al_install_keyboard();
@@ -75,8 +74,8 @@ Graphics::~Graphics() {
 
 errors_s Graphics::updateGraphics(std::vector<MartusUnidades> newUnitList,
                                 std::vector<MartusBuildings> newBuildingList){
-    this->unitList = newUnitList;
-    this->buildingList = newBuildingList;
+    this->map.setUnits(newUnitList);
+    this->map.setBuildings(newBuildingList);
 	showTransition();
 	drawMap();
 	if (graphicsError == G_NO_ERROR) {
@@ -96,10 +95,7 @@ void Graphics::drawMap() {
 		al_draw_scaled_bitmap(bmp, 67, 55, 995, 1490, 0, 0, TILE_SIDE * 16 + (DISPLAY_WIDTH_OFFSET * 2),
 			TILE_SIDE * 12 + (DISPLAY_HEIGHT_OFFSET * 2), 0);
 		al_destroy_bitmap(bmp);
-		str = "./resources/pop-up.png";
-		bmp = al_load_bitmap(str.c_str());
-		al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, TILE_SIDE * 16, -24, TILE_SIDE * 6.6, TILE_SIDE *13.5, 0);
-		al_destroy_bitmap(bmp);
+		reDrawSide();
 	}
 	return;
 }
@@ -111,17 +107,17 @@ void Graphics::showLine(unsigned int line){
     std::vector<MartusUnidades> unitsInLine;
 	
 	//Cargo los elementos encontrados en la linea en cada vector
-    for(unsigned int j=0 ; j < terrainList.size() ; j++){
-        if(this->terrainList[j].getPosition().y == line)
-            terrainsInLine.push_back(this->terrainList[j]);
+    for(unsigned int j=0 ; j < map.getTerrains().size() ; j++){
+        if(this->map.getTerrains()[j].getPosition().y == line)
+            terrainsInLine.push_back(this->map.getTerrains()[j]);
     }
-    for(unsigned int j=0 ; j < this->buildingList.size() ; j++){
-        if(this->buildingList[j].getPosition().y == line)
-            buildingsInLine.push_back(this->buildingList[j]);
+    for(unsigned int j=0 ; j < this->map.getBuildings().size() ; j++){
+        if(this->map.getBuildings()[j].getPosition().y == line)
+            buildingsInLine.push_back(this->map.getBuildings()[j]);
     }
-    for(unsigned int j=0 ; j < this->unitList.size() ; j++){
-        if(this->unitList[j].getPosition().y == line)
-            unitsInLine.push_back(this->unitList[j]);
+    for(unsigned int j=0 ; j < this->map.getUnits().size() ; j++){
+        if(this->map.getUnits()[j].getPosition().y == line)
+            unitsInLine.push_back(this->map.getUnits()[j]);
     }
 
     //FALTA HACER LA TRANSICION ENTRE MOVIMIENTOS PARA QUE EL JUEGO SE VEA MAS FLUIDO
@@ -149,7 +145,7 @@ void Graphics::drawTerrain(MartusTerrains terrainToDraw){
 		if (terrainToDraw.getFog() == false) {
 #endif
 
-			ALLEGRO_BITMAP * bmp = al_load_bitmap(getTerrainImagePath(terrainToDraw, terrainList).c_str());
+			ALLEGRO_BITMAP * bmp = al_load_bitmap(getTerrainImagePath(terrainToDraw, map.getTerrains()).c_str());
 			if (bmp != NULL) {
 				//al_draw_bitmap(bmp, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
 				//	terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, 0);
@@ -228,106 +224,76 @@ action_s Graphics::getUserAction(){
     return action;
 }
 
-void Graphics::setTeam(int team){
-    this->team = team;
-    return;
-}
-
 action_s Graphics::getMouseAction(){
     ALLEGRO_EVENT ev;
     bool tmp = true;
     action_s temp;
-    while(tmp){
-        al_get_next_event(this->evQueue,&ev);
-        switch(ev.type){
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                tmp = false;
-                break;
-            case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                if(ev.mouse.button == LEFT_CLICK)
-                    tmp = false;
-                break;
-            default:
-                break;
-        }
-    }
-    if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
-        int x = ev.mouse.x;
-        int y = ev.mouse.y;
-		int xTile, yTile;
-        xTile = (x - DISPLAY_WIDTH_OFFSET)/TILE_SIDE;
-        yTile = (y - DISPLAY_HEIGHT_OFFSET)/TILE_SIDE;
-        temp.act = A_NO_ACTION;
-        temp = showPopUp(map.getOptions(xTile, yTile),xTile, yTile);
-    }
-    else 
-        temp.act = A_CLOSE_GAME;
+	if (graphicsError == G_NO_ERROR) {
+		while (tmp) {
+			al_get_next_event(this->evQueue, &ev);
+			if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+				tmp = false;
+			}
+		}
+		if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+			int x = ev.mouse.x;
+			int y = ev.mouse.y;
+			int xTile, yTile;
+			xTile = (x - DISPLAY_WIDTH_OFFSET) / TILE_SIDE;
+			yTile = (y - DISPLAY_HEIGHT_OFFSET) / TILE_SIDE;
+			temp.act = A_NO_ACTION;
+			temp = showPopUp(map.getOptions(xTile, yTile), xTile, yTile);
+		}
+		else
+			temp.act = A_CLOSE_GAME;
+	}
+	else {
+		temp.act = A_CLOSE_GAME;
+	}
     return temp;
 }
 
 action_s Graphics::showPopUp(options_s opt, int xTile, int yTile){
-	drawMap();
-	unsigned int amountOfLines = 0;
-    if(opt.attackUpAvailable)
-        amountOfLines++;
-    else if(opt.attackDownAvailable)
-        amountOfLines++;
-    else if(opt.attackRightAvailable)
-        amountOfLines++;
-    else if(opt.attackLeftAvailable)
-        amountOfLines++;
-    else if(opt.buyAvailable)
-        amountOfLines++;
-    else if(opt.moveUpAvailable)
-        amountOfLines++;
-    else if(opt.moveDownAvailable)
-        amountOfLines++;
-    else if(opt.moveLeftAvailable)
-        amountOfLines++;
-    else if(opt.moveRightAvailable)
-        amountOfLines++;
-    else if(opt.passAvailable)
-        amountOfLines++;
-
-    amountOfLines = 1;
+	reDrawSide();
+    int amountOfLines = 1;
 	if (graphicsError == G_NO_ERROR) {
 		if (opt.attackUpAvailable) {
 			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'W' to attack Up!");
 			amountOfLines++;
 		}
-		else if (opt.attackDownAvailable) {
+		if (opt.attackDownAvailable) {
 			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'S' to attack Down!");
 			amountOfLines++;
 		}
-		else if (opt.attackRightAvailable) {
+		if (opt.attackRightAvailable) {
 			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'D' to attack Right!");
 			amountOfLines++;
 		}
-		else if (opt.attackLeftAvailable) {
+		if (opt.attackLeftAvailable) {
 			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'A' to attack Left!");
 			amountOfLines++;
 		}
-		else if (opt.buyAvailable) {
+		if (opt.buyAvailable) {
 			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'B' to Buy!");
 			amountOfLines++;
 		}
-		else if (opt.moveUpAvailable) {
+		if (opt.moveUpAvailable) {
 			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "Up Arrow to Move Up!");
 			amountOfLines++;
 		}
-		else if (opt.moveDownAvailable) {
+		if (opt.moveDownAvailable) {
 			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "Down Arrow to Move Down!");
 			amountOfLines++;
 		}
-		else if (opt.moveLeftAvailable) {
+		if (opt.moveLeftAvailable) {
 			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "Left Arrow to Move Left!");
 			amountOfLines++;
 		}
-		else if (opt.moveRightAvailable) {
+		if (opt.moveRightAvailable) {
 			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "Right Arrow to Move Right!");
 			amountOfLines++;
 		}
-		else if (opt.passAvailable) {
+		if (opt.passAvailable) {
 			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17, TILE_SIDE * (amountOfLines + 1), 0, "'P' to Pass!");
 			amountOfLines++;
 		}
@@ -437,7 +403,7 @@ void Graphics::showTransition() {
 			al_draw_text(fontLarge, al_map_rgb(i, i,i), TILE_SIDE * 3, TILE_SIDE * 4, 0,
 				"Some changes have been happening during night!");
 			al_flip_display();
-			timerMiliseconds(10);
+			timerMiliseconds(100);
 		}
 		for (unsigned int i = 0; i < 255; i++) {
 			al_clear_to_color(al_map_rgb(i, i, i));
@@ -451,34 +417,17 @@ void Graphics::showTransition() {
 }
 
 void Graphics::drawMessage() {
-	drawMap();
-	//al_draw_filled_rectangle((DISPLAY_WIDTH / 2) - 50, (DISPLAY_HEIGHT / 2) - 50, (DISPLAY_WIDTH / 2) + 50,
-	//	(DISPLAY_HEIGHT / 2) + 50, al_map_rgb(255, 255, 255));
+	//drawMap();
 	if (graphicsError == G_NO_ERROR) {
-		string str = "./resources/pop-up.png";
-		ALLEGRO_BITMAP * bmp = al_load_bitmap(str.c_str());
-		if (bmp == NULL) {
-			graphicsError = G_LOAD_BITMAP_ERROR;
-		}
-		else {
-			al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, DISPLAY_WIDTH / 4, DISPLAY_HEIGHT / 4, TILE_SIDE * 5, TILE_SIDE * 5, 0);
-			al_destroy_bitmap(bmp);
-			al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 7, TILE_SIDE * 5, 0, "Your Turn!");
-		}
-	}
-	if (graphicsError == G_NO_ERROR) {
-		al_flip_display();
-	}
-	timerMiliseconds(1000);
-	drawMap();
-	if (graphicsError == G_NO_ERROR) {
+		reDrawSide();
+		al_draw_text(font, al_map_rgb(0, 0, 0), TILE_SIDE * 17 , TILE_SIDE * 2, 0, "Your Turn!");
 		al_flip_display();
 	}
 	return;
 }
 
 void Graphics::displayActionInvalid() {
-	drawMap();
+	//drawMap();
 	//al_draw_filled_rectangle((DISPLAY_WIDTH / 2) - 50, (DISPLAY_HEIGHT / 2) - 50, (DISPLAY_WIDTH / 2) + 50,
 	//	(DISPLAY_HEIGHT / 2) + 50, al_map_rgb(255, 255, 255));
 	if (graphicsError == G_NO_ERROR) {
@@ -495,8 +444,8 @@ void Graphics::displayActionInvalid() {
 	}
 	if (graphicsError == G_NO_ERROR) {
 		al_flip_display();
+		timerMiliseconds(2000);
 	}
-	timerMiliseconds(2000);
 	drawMap();
 	if (graphicsError == G_NO_ERROR) {
 		al_flip_display();
@@ -505,7 +454,7 @@ void Graphics::displayActionInvalid() {
 }
 
 void Graphics::showDices(int yours, int enemys) {
-	drawMap();
+	//drawMap();
 	if (graphicsError == G_NO_ERROR) {
 		al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 5, TILE_SIDE, 0, "The Dices Were:");
 		string str1, str2, str3, str;
@@ -520,7 +469,7 @@ void Graphics::showDices(int yours, int enemys) {
 			al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 6, TILE_SIDE * 3, 0, "You Lose :(");
 		}
 		al_flip_display();
-		timerMiliseconds(1000);
+		timerMiliseconds(100);
 		drawMap();
 		if (graphicsError == G_NO_ERROR) {
 			al_flip_display();
@@ -529,50 +478,50 @@ void Graphics::showDices(int yours, int enemys) {
 	return;
 }
 
-string Graphics::getUnitImagePath(units_d typeOfUnit, int team) {
+string Graphics::getUnitImagePath(int typeOfUnit, int team) {
 	string answer;
 	switch (typeOfUnit) {
-	case UNIDAD_1:
+	case ANTIAIR:
 		answer = "./resources/Images/units/antiair_";
 		break;
-	case UNIDAD_2:
+	case APC:
 		answer = "./resources/Images/units/apc_";
 		break;
-	case UNIDAD_3:
+	case ARTILLERY:
 		answer = "./resources/Images/units/artillery_";
 		break;
-	case UNIDAD_4:
+	case INFANTRY:
 		answer = "./resources/Images/units/infantry_";
 		break;
-	case UNIDAD_5:
+	case MECH:
 		answer = "./resources/Images/units/mech_";
 		break;
-	case UNIDAD_6:
+	case MEDTANK:
 		answer = "./resources/Images/units/medtank_";
 		break;
-	case UNIDAD_7:
+	case RECON:
 		answer = "./resources/Images/units/recon_";
 		break;
-	case UNIDAD_8:
+	case ROCKET:
 		answer = "./resources/Images/units/rocket_";
 		break;
-	case UNIDAD_9:
+	case TANK:
 		answer = "./resources/Images/units/tank_";
 		break;
 	default:
 		break;
 	}
 	switch (team) {
-	case TEAM_1:
+	case TEAM_RED:
 		answer = answer + "1.png";
 		break;
-	case TEAM_2:
+	case TEAM_BLUE:
 		answer = answer + "2.png";
 		break;
-	case TEAM_3:
+	case TEAM_GREEN:
 		answer = answer + "3.png";
 		break;
-	case TEAM_4:
+	case TEAM_YELLOW:
 		answer = answer + "4.png";
 		break;
 	default:
@@ -583,32 +532,32 @@ string Graphics::getUnitImagePath(units_d typeOfUnit, int team) {
 	return answer;
 }
 
-string Graphics::getBuildingImagePath(buildings_d typeOfBuild, int team) {
+string Graphics::getBuildingImagePath(int typeOfBuild, int team) {
 	string answer;
 	switch (typeOfBuild) {
-	case EDIFICIO_1:
+	case CITY:
 		answer = "./resources/Images/building/city_";
 		break;
-	case EDIFICIO_2:
+	case FACTORY:
 		answer = "./resources/Images/building/factory_";
 		break;
-	case EDIFICIO_3:
+	case HQ:
 		answer = "./resources/Images/building/hq_";
 		break;
 	default:
 		break;
 	}
 	switch (team) {
-	case TEAM_1:
+	case TEAM_RED:
 		answer = answer + "1.png";
 		break;
-	case TEAM_2:
+	case TEAM_BLUE:
 		answer = answer + "2.png";
 		break;
-	case TEAM_3:
+	case TEAM_GREEN:
 		answer = answer + "3.png";
 		break;
-	case TEAM_4:
+	case TEAM_YELLOW:
 		answer = answer + "4.png";
 		break;
 	case NO_TEAM:
@@ -623,16 +572,16 @@ string Graphics::getBuildingImagePath(buildings_d typeOfBuild, int team) {
 
 string Graphics::getTerrainImagePath(MartusTerrains terrain, std::vector<MartusTerrains> list) {
 	string answer;
-	if (terrain.getTypeOfTerrain() == TERRENO_1) {
+	if (terrain.getTypeOfTerrain() == FOREST) {
 		answer = "./resources/Images/terrain/forest.png";
 	}
-	else if (terrain.getTypeOfTerrain() == TERRENO_2) {
+	else if (terrain.getTypeOfTerrain() == HILL) {
 		answer = "./resources/Images/terrain/hill.png";
 	}
-	else if (terrain.getTypeOfTerrain() == TERRENO_3) {
+	else if (terrain.getTypeOfTerrain() == PLAIN) {
 		answer = "./resources/Images/terrain/plain.png";
 	}
-	else if (terrain.getTypeOfTerrain() == TERRENO_4) { //RIO
+	else if (terrain.getTypeOfTerrain() == RIVER) { //RIO
 		answer = "./resources/Images/terrain/";
 		bool isThereOneUp, isThereOneDown, isThereOneLeft, isThereOneRight;
 		isThereOneUp = false;
@@ -640,19 +589,19 @@ string Graphics::getTerrainImagePath(MartusTerrains terrain, std::vector<MartusT
 		isThereOneLeft = false;
 		isThereOneRight = false;
 		for (unsigned int i = 0; i < list.size(); i++) {
-			if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y - 1) == terrain.getPosition().y &&
+			if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y - 1 &&
 				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
 				isThereOneUp = true;
 			}
-			else if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y + 1) == terrain.getPosition().y &&
+			else if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y + 1 &&
 				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
 				isThereOneDown = true;
 			}
-			else if ((list[i].getPosition().x-1) == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y &&
+			else if ((list[i].getPosition().x) == terrain.getPosition().x - 1 && (list[i].getPosition().y) == terrain.getPosition().y &&
 				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
 				isThereOneLeft = true;
 			}
-			else if ((list[i].getPosition().x +1) == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y &&
+			else if ((list[i].getPosition().x) == terrain.getPosition().x + 1 && (list[i].getPosition().y) == terrain.getPosition().y &&
 				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
 				isThereOneRight = true;
 			}
@@ -674,7 +623,7 @@ string Graphics::getTerrainImagePath(MartusTerrains terrain, std::vector<MartusT
 		str = str + ".png";
 		answer = answer + str;
 	}
-	else if (terrain.getTypeOfTerrain() == TERRENO_5) { //Camino
+	else if (terrain.getTypeOfTerrain() == STREET) { //Camino
 		answer = "./resources/Images/terrain/";
 		bool isThereOneUp, isThereOneDown, isThereOneLeft, isThereOneRight;
 		isThereOneUp = false;
@@ -682,19 +631,19 @@ string Graphics::getTerrainImagePath(MartusTerrains terrain, std::vector<MartusT
 		isThereOneLeft = false;
 		isThereOneRight = false;
 		for (unsigned int i = 0; i < list.size(); i++) {
-			if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y - 1) == terrain.getPosition().y &&
+			if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y - 1 &&
 				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
 				isThereOneUp = true;
 			}
-			else if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y + 1) == terrain.getPosition().y &&
+			else if (list[i].getPosition().x == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y + 1 &&
 				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
 				isThereOneDown = true;
 			}
-			else if ((list[i].getPosition().x - 1) == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y &&
+			else if ((list[i].getPosition().x) == terrain.getPosition().x - 1 && (list[i].getPosition().y) == terrain.getPosition().y &&
 				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
 				isThereOneLeft = true;
 			}
-			else if ((list[i].getPosition().x + 1) == terrain.getPosition().x && (list[i].getPosition().y) == terrain.getPosition().y &&
+			else if ((list[i].getPosition().x) == terrain.getPosition().x + 1 && (list[i].getPosition().y) == terrain.getPosition().y &&
 				list[i].getTypeOfTerrain() == terrain.getTypeOfTerrain()) {
 				isThereOneRight = true;
 			}
@@ -717,4 +666,12 @@ string Graphics::getTerrainImagePath(MartusTerrains terrain, std::vector<MartusT
 		answer = answer + str;
 	}
 	return answer;
+}
+
+void Graphics::reDrawSide() {
+	string str = "./resources/pop-up.png";
+	ALLEGRO_BITMAP *bmp = al_load_bitmap(str.c_str());
+	al_draw_scaled_bitmap(bmp, 0, 0, 575, 600, TILE_SIDE * 16, -24, TILE_SIDE * 6.6, TILE_SIDE *13.5, 0);
+	al_destroy_bitmap(bmp);
+	return;
 }

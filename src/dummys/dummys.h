@@ -7,14 +7,14 @@
 
 using namespace std;
 
-typedef enum{UNIDAD_1,UNIDAD_2,UNIDAD_3,UNIDAD_4,UNIDAD_5,UNIDAD_6,UNIDAD_7,UNIDAD_8,UNIDAD_9}units_d;
-typedef enum{TERRENO_1,TERRENO_2,TERRENO_3,TERRENO_4,TERRENO_5,TERRENO_6}terrains_d;
-typedef enum{EDIFICIO_1,EDIFICIO_2,EDIFICIO_3,EDIFICIO_4,EDIFICIO_5}buildings_d;
-typedef enum{TEAM_1,TEAM_2,TEAM_3,TEAM_4,NO_TEAM}teams_d;
+typedef enum{ANTIAIR,APC,ARTILLERY,INFANTRY,MECH,MEDTANK,RECON,ROCKET,TANK}units_d;
+typedef enum{FOREST,HILL,PLAIN,RIVER,STREET}terrains_d;
+typedef enum{CITY,FACTORY,HQ}buildings_d;
+typedef enum{TEAM_RED,TEAM_BLUE,TEAM_GREEN,TEAM_YELLOW,NO_TEAM}teams_d;
 
 typedef struct{
-    unsigned int x;
-    unsigned int y;
+    int x;
+    int y;
 }position_s;
 
 typedef struct{
@@ -33,10 +33,9 @@ typedef struct{
 class MartusUnidades
 {
 public:
-	void setUnit(units_d type, position_s pos, int team, bool fog);
+	void setUnit(int type, position_s pos, int team, bool fog);
     position_s getPosition();
-    units_d getTypeOfUnit();
-    //string getImagePath();
+    int getTypeOfUnit();
     int getTeam();
     bool getFog();
     void setFogOn();
@@ -46,7 +45,7 @@ protected:
     int team;
     bool fog;
 private:
-    units_d typeOfUnit;
+    int typeOfUnit;
 };
 
 class MartusTerrains
@@ -54,8 +53,7 @@ class MartusTerrains
 public:
 	void setTerrain(terrains_d type, position_s pos, bool fog);
     position_s getPosition();
-    terrains_d getTypeOfTerrain();
-    //string getImagePath();
+    int getTypeOfTerrain();
     bool getFog();
     void setFogOn();
 protected:
@@ -63,16 +61,15 @@ protected:
     string imagePath;
     bool fog;
 private:
-    terrains_d typeOfTerrain;
+    int typeOfTerrain;
 };
 
 class MartusBuildings
 {
 public:
-	void setBuilding(buildings_d type, position_s pos, int team, bool fog);
+	void setBuilding(int type, position_s pos, int team, bool fog);
     position_s getPosition();
-    buildings_d getTypeOfBuilding();
-    //string getImagePath();
+    int getTypeOfBuilding();
     int getTeam();
     bool getFog();
     void setFogOn();
@@ -83,16 +80,18 @@ protected:
     bool fog;
 	bool buildingIsFree;
 private:
-    buildings_d typeOfBuilding;
+	int typeOfBuilding;
 };
 
 class MartusMap
 {
 public:
-    //void updateFog();
     std::vector<MartusBuildings> getBuildings();
     std::vector<MartusTerrains> getTerrains();
     std::vector<MartusUnidades> getUnits();
+	void setTerrains(std::vector<MartusTerrains> newTerr);
+	void setBuildings(std::vector<MartusBuildings> newBuild);
+	void setUnits(std::vector<MartusUnidades> newUnits);
 	void addTerrain(MartusTerrains newTerrain);
 	void addBuilding(MartusBuildings newBuilding);
 	void addUnit(MartusUnidades newUnit);

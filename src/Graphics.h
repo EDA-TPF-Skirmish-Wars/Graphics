@@ -69,19 +69,13 @@ typedef struct {
 class Graphics
 {
 public:
-    Graphics(std::vector<MartusTerrains> newTerrainList, 
-                std::vector<MartusUnidades> newUnitList, 
-                std::vector<MartusBuildings> newBuildingList);//Funciona perfecta
+	Graphics(MartusMap map);//Funciona perfecta
 /*Funcion de inicializacion de la clase, se le debe pasar 3 vectores uno con Terrenos, otro con unidades y
 el tercero con edificios.
 NO devuelve nada.
 */
     ~Graphics();//Funciona perfecta
     
-    void setTeam(int team);
-/*Funcion de seteo del team del correspondiente jugador, se le debe pasar TEAM_1, TEAM_2, TEAM_3 o TEAM_4 como parametro y no devuelve nada.
-Sirve para ver el color de tus propias unidades.
-*/
     //introduction(); //poner algun presentacion al juego para hacerlo mas copado
 
     errors_s updateGraphics(std::vector<MartusUnidades> unitList,
@@ -104,11 +98,7 @@ Devuelve: una action_s
 	void showDices(int yours, int enemys);//Funciona perfecta
 
 protected:
-    std::vector<MartusUnidades> unitList;
-    std::vector<MartusBuildings> buildingList;
-    std::vector<MartusTerrains> terrainList;
     MartusMap map;
-    int team;
 private:
     void showLine(unsigned int i); //Funciona perfecta
     //
@@ -124,9 +114,10 @@ private:
     action_s showPopUp(options_s opt, int xTile, int yTile); //Funciona perfecta
 	void drawMap();//Funciona perfecta
 	void drawMessage();//Funciona perfecta
-	string getBuildingImagePath(buildings_d typeBuild, int team);
+	string getBuildingImagePath(int typeBuild, int team);
 	string getTerrainImagePath(MartusTerrains terrain, std::vector<MartusTerrains> list);
-	string getUnitImagePath(units_d typeUnit, int team);
+	string getUnitImagePath(int typeUnit, int team);
+	void reDrawSide();
 
     ALLEGRO_DISPLAY * display = NULL;
     ALLEGRO_EVENT_QUEUE * evQueue = NULL;
