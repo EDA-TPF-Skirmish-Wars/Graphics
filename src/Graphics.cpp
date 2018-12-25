@@ -428,7 +428,7 @@ void Graphics::showTransition() {
 	if (graphicsError == G_NO_ERROR) {
 		for (unsigned int i = 255; i > 0; i--) {
 			al_clear_to_color(al_map_rgb(i, i, i));
-			al_draw_text(fontLarge, al_map_rgb((255 - i), (255 - i), (255 - i)), TILE_SIDE * 3, TILE_SIDE * 4, 0,
+			al_draw_text(fontLarge, al_map_rgb((255 - i), (255 - i), (255 - i)), TILE_SIDE * 3, TILE_SIDE * 5, 0,
 				"Some changes have been happening during night!");
 			al_flip_display();
 			timerMiliseconds(10);
@@ -436,7 +436,7 @@ void Graphics::showTransition() {
 		timerMiliseconds(10);
 		for (unsigned int i = 0; i < 255; i++) {
 			al_clear_to_color(al_map_rgb(i, i, i));
-			al_draw_text(fontLarge, al_map_rgb((255-i),(255-i), (255-i)), TILE_SIDE * 3, TILE_SIDE*4, 0, 
+			al_draw_text(fontLarge, al_map_rgb((255-i),(255-i), (255-i)), TILE_SIDE * 3, TILE_SIDE*5, 0, 
 				"Some changes have been happening during night!");
 			al_flip_display();
 			timerMiliseconds(10);
@@ -705,9 +705,9 @@ void Graphics::introduction() {
 		ALLEGRO_BITMAP * bmp = al_load_bitmap("./resources/banner.png");
 		if (bmp != NULL) {
 			//timerMiliseconds(1000);
-			for (int i = 0; i < DISPLAY_HEIGHT; i++) {
-				al_clear_to_color(al_map_rgb(0, 0, 0));
-				al_draw_scaled_bitmap(bmp, 0, 0, 1000, 500, 0, DISPLAY_HEIGHT - i, DISPLAY_WIDTH,DISPLAY_HEIGHT *2 -i, 0);
+			for (int i = DISPLAY_HEIGHT; i > 0; i--) {
+				al_clear_to_color(al_map_rgb(255, 255, 255));
+				al_draw_scaled_bitmap(bmp, 0, 0, 1000, 500, 0, i, DISPLAY_WIDTH,DISPLAY_HEIGHT +i, 0);
 				if (graphicsError == G_NO_ERROR) {
 					al_flip_display();
 				}
@@ -720,7 +720,7 @@ void Graphics::introduction() {
 		}
 		bmp = al_load_bitmap("./resources/pressstart.png");
 		if (bmp != NULL && graphicsError == G_NO_ERROR) {
-			al_draw_bitmap(bmp, TILE_SIDE * 4, TILE_SIDE * 8,0);
+			al_draw_bitmap(bmp, TILE_SIDE * 5, TILE_SIDE * 8,0);
 			if (graphicsError == G_NO_ERROR) {
 				al_flip_display();
 			}
@@ -738,7 +738,8 @@ void Graphics::introduction() {
 				tmp = true;
 			}
 		}
-		al_clear_to_color(al_map_rgb(0, 0, 0));
+		al_clear_to_color(al_map_rgb(255, 255, 255));
+		al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 9, TILE_SIDE * 5, 0,"Please Wait");
 		al_flip_display();
 		if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			graphicsError = G_GAME_CLOSED;

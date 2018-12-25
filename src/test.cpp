@@ -8,14 +8,14 @@
 #include <cstdlib>
 #include <ctime>
 
-#ifndef DEBUG
+#ifdef _WIN32
 #include <Windows.h>
-#endif // DEBUG
+#endif // _WIN32
 
 int main(void) {
-#ifndef DEBUG
+#ifdef _WIN32
 	ShowWindow(GetConsoleWindow(), SW_HIDE);
-#endif // !DEBUG
+#endif // _WIN32
 	srand(time(NULL));
 	if (!al_init()) {
 		printf("Could Not Init Alegro\n");
@@ -74,13 +74,13 @@ int main(void) {
 		tstMap.addBuilding(tstBuil);
 	}
 	Graphics tstGr(tstMap);
-	tstGr.getUserAction();
+	action_s act = tstGr.getUserAction();
 	pos.x = 7;
 	pos.y = 9;
 	tstUnit.setUnit(ARTILLERY, pos, TEAM_YELLOW, true);
 	tstMap.addUnit(tstUnit);
 	tstGr.updateGraphics(tstMap);
-	tstGr.getUserAction();
+	act = tstGr.getUserAction();
 	tstGr.showDices((rand()%6)+1, (rand()%6)+1);
 	return 0;
 }
