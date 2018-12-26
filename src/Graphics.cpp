@@ -17,9 +17,9 @@
 
 
 
-Graphics::Graphics(MartusMap map) {
+Graphics::Graphics(Map myMap) {
 	this->graphicsError = G_NO_ERROR;
-	this->map = map;
+	this->myMap = myMap;
 	this->display = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 	if (display == NULL) {
 		graphicsError = G_DISPLAY_ERROR;
@@ -113,8 +113,8 @@ Graphics::~Graphics() {
     return;
 }
 
-errors_s Graphics::updateGraphics(MartusMap newMap){
-	this->map = newMap;
+errors_s Graphics::updateGraphics(Map newMap){
+	this->myMap = newMap;
 	showTransition();
 	drawMap();
 	if (graphicsError == G_NO_ERROR) {
@@ -141,22 +141,22 @@ void Graphics::drawMap() {
 
 void Graphics::showLine(unsigned int line){
     //Dibuja los elementos que se encuentran en la linea i del mapa, las lineas van de 0-11 y las columnas de 0-15
-    std::vector<MartusTerrains> terrainsInLine;     //Creo vectores con los los elementos de la linea a dibujar
-    std::vector<MartusBuildings> buildingsInLine;
-    std::vector<MartusUnidades> unitsInLine;
+    std::vector<Terrain> terrainsInLine;     //Creo vectores con los los elementos de la linea a dibujar
+    std::vector<Building> buildingsInLine;
+    std::vector<Unit> unitsInLine;
 	
 	//Cargo los elementos encontrados en la linea en cada vector
-    for(unsigned int j=0 ; j < map.getTerrains().size() ; j++){
-        if(this->map.getTerrains()[j].getPosition().y == line)
-            terrainsInLine.push_back(this->map.getTerrains()[j]);
+    for(unsigned int j=0 ; j < myMap.getTerrains().size() ; j++){
+        if(this->myMap.getTerrains()[j].getPosition().y == line)
+            terrainsInLine.push_back(this->myMap.getTerrains()[j]);
     }
-    for(unsigned int j=0 ; j < this->map.getBuildings().size() ; j++){
-        if(this->map.getBuildings()[j].getPosition().y == line)
-            buildingsInLine.push_back(this->map.getBuildings()[j]);
+    for(unsigned int j=0 ; j < this->myMap.getBuildings().size() ; j++){
+        if(this->myMap.getBuildings()[j].getPosition().y == line)
+            buildingsInLine.push_back(this->myMap.getBuildings()[j]);
     }
-    for(unsigned int j=0 ; j < this->map.getUnits().size() ; j++){
-        if(this->map.getUnits()[j].getPosition().y == line)
-            unitsInLine.push_back(this->map.getUnits()[j]);
+    for(unsigned int j=0 ; j < this->myMap.getUnits().size() ; j++){
+        if(this->myMap.getUnits()[j].getPosition().y == line)
+            unitsInLine.push_back(this->myMap.getUnits()[j]);
     }
 
     //tengo cargado en las listas los elementos de la fila correspodiente
@@ -175,13 +175,13 @@ void Graphics::showLine(unsigned int line){
 	return;
 }
 
-void Graphics::drawTerrain(MartusTerrains terrainToDraw){
+void Graphics::drawTerrain(Terrain terrainToDraw){
 	if (graphicsError == G_NO_ERROR) {
 #ifdef FOW
 		if (terrainToDraw.getFog() == false) {
 #endif
 
-			ALLEGRO_BITMAP * bmp = al_load_bitmap(getTerrainImagePath(terrainToDraw, map.getTerrains()).c_str());
+			ALLEGRO_BITMAP * bmp = al_load_bitmap(getTerrainImagePath(terrainToDraw, myMap.getTerrains()).c_str());
 			if (bmp != NULL) {
 				al_draw_scaled_bitmap(bmp, 0, 0, 350,350, terrainToDraw.getPosition().x * TILE_SIDE + DISPLAY_WIDTH_OFFSET,
 					terrainToDraw.getPosition().y * TILE_SIDE + DISPLAY_HEIGHT_OFFSET, TILE_SIDE, TILE_SIDE, 0);
@@ -196,10 +196,10 @@ void Graphics::drawTerrain(MartusTerrains terrainToDraw){
 	return;
 }
 
-void Graphics::drawBuilding(MartusBuildings buildingToDraw){
+void Graphics::drawBuilding(Building buildingToDraw){
 	if (graphicsError == G_NO_ERROR) {
 #ifdef FOW
-		if (buildingToDraw.getFog() == false || buildingToDraw.getTeam() == map.getTeam()) {
+		if (buildingToDraw.getFog() == false || buildingToDraw.getTeam() == myMap.getTeam()) {
 #endif
 			ALLEGRO_BITMAP * bmp = al_load_bitmap(getBuildingImagePath(buildingToDraw.getTypeOfBuilding(),
 				buildingToDraw.getTeam()).c_str());
@@ -217,10 +217,10 @@ void Graphics::drawBuilding(MartusBuildings buildingToDraw){
 	return; //error;
 }
 
-void Graphics::drawUnit(MartusUnidades unitToDraw){
+void Graphics::drawUnit(Unit unitToDraw){
 	if (graphicsError == G_NO_ERROR) {
 #ifdef FOW
-		if (unitToDraw.getFog() == false || unitToDraw.getTeam() == map.getTeam()) {
+		if (unitToDraw.getFog() == false || unitToDraw.getTeam() == myMap.getTeam()) {
 #endif
 			ALLEGRO_BITMAP * bmp = al_load_bitmap(getUnitImagePath(unitToDraw.getTypeOfUnit(),
 				unitToDraw.getTeam()).c_str());
@@ -270,7 +270,7 @@ action_s Graphics::getMouseAction(){
 			xTile = (x - DISPLAY_WIDTH_OFFSET) / TILE_SIDE;
 			yTile = (y - DISPLAY_HEIGHT_OFFSET) / TILE_SIDE;
 			temp.act = A_NO_ACTION;
-			temp = showPopUp(map.getOptions(xTile, yTile), xTile, yTile);
+			temp = showPopUp(myMap.getOptions(xTile, yTile), xTile, yTile);
 		}
 		else
 			temp.act = A_CLOSE_GAME;
@@ -594,7 +594,7 @@ string Graphics::getBuildingImagePath(int typeOfBuild, int team) {
 	return answer;
 }
 
-string Graphics::getTerrainImagePath(MartusTerrains terrain, std::vector<MartusTerrains> list) {
+string Graphics::getTerrainImagePath(Terrain terrain, std::vector<Terrain> list) {
 	string answer;
 	if (terrain.getTypeOfTerrain() == FOREST) {
 		answer = "./resources/Images/terrain/forest.png";

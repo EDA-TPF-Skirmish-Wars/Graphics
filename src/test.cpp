@@ -21,10 +21,10 @@ int main(void) {
 		printf("Could Not Init Alegro\n");
 		return -1;
 	}
-	MartusMap tstMap;
-	MartusTerrains tstTerr;
-	MartusUnidades tstUnit;
-	MartusBuildings tstBuil;
+	Map tstMap;
+	Terrain tstTerr;
+	Unit tstUnit;
+	Building tstBuil;
 	position_s pos;
 	for (int i = 0; i < 12; i++) {
 		for (int u = 0; u < 16; u++) {

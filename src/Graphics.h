@@ -56,7 +56,7 @@ typedef enum {G_LOAD_GRAPHICS_ERROR, G_NO_ERROR,G_LOAD_BITMAP_ERROR, G_DISPLAY_E
 typedef struct{
     position_s positionFrom;
     position_s positionTo;
-    MartusUnidades unitType;
+    Unit unitType;
 }movement_s;
 
 typedef struct {
@@ -70,7 +70,7 @@ typedef struct {
 class Graphics
 {
 public:
-	Graphics(MartusMap map);//Funciona perfecta
+	Graphics(Map myMap);//Funciona perfecta
 /*Funcion de inicializacion de la clase, se le debe pasar un mapa con edificios, terrenos y unidades cargados
 NO devuelve nada.
 */
@@ -78,7 +78,7 @@ NO devuelve nada.
     
     //introduction(); //poner algun presentacion al juego para hacerlo mas copado
 
-    errors_s updateGraphics(MartusMap newMap); //Funciona perfecta
+    errors_s updateGraphics(Map newMap); //Funciona perfecta
 /*  Esta funcion se la utiliza para actualizar los vectores de unidades y de edificios que fueron modificados por el
 jugador oponente. Se le pasa el nuevo mapa, con los nuevos vectores de unidades y edificios que actualiza el vector contenido
 dentro de esta clase. Y una vez actualizado grafica todas las lineas del mapa para que se vean en pantalla.
@@ -105,14 +105,14 @@ Devuelve: una action_s
 	*/
 
 protected:
-    MartusMap map;
+    Map myMap;
 private:
     void showLine(unsigned int i); //Funciona perfecta
 	/*Funcion encargada de dibujar en el display la linea numero i contando de arriba hacia abajo, es decir la linea
 	numero 0 es la linea horizontal superior y la linea numero 11  es la linea horizontal inferior.*/
-    void drawTerrain(MartusTerrains terrainToDraw);//Funciona perfecta
-    void drawBuilding(MartusBuildings buildingToDraw);//Funciona perfecta
-    void drawUnit(MartusUnidades unitToDraw);//Funciona perfecta
+    void drawTerrain(Terrain terrainToDraw);//Funciona perfecta
+    void drawBuilding(Building buildingToDraw);//Funciona perfecta
+    void drawUnit(Unit unitToDraw);//Funciona perfecta
     void showTransition();//Funciona perfecta
     action_s getMouseAction(void);//Funciona perfecta
     action_s getKeyboardAction(int xTile, int yTile);//Funciona perfecta
@@ -120,7 +120,7 @@ private:
 	void drawMap();//Funciona perfecta, un poco lenta
 	void drawMessage();//Funciona perfecta
 	string getBuildingImagePath(int typeBuild, int team);//Funciona perfecta
-	string getTerrainImagePath(MartusTerrains terrain, std::vector<MartusTerrains> list);//Funciona perfecta
+	string getTerrainImagePath(Terrain terrain, std::vector<Terrain> list);//Funciona perfecta
 	string getUnitImagePath(int typeUnit, int team);//Funciona perfecta
 	void reDrawSide();//Funciona perfecta
 	void introduction();

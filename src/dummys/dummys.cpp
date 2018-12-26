@@ -1,7 +1,7 @@
 #include "./dummys.h"
 
 
-void MartusUnidades::setUnit(int type, position_s pos, int team, bool fog) {
+void Unit::setUnit(int type, position_s pos, int team, bool fog) {
 	typeOfUnit = type;
 	position = pos;
 	this->team = team;
@@ -9,101 +9,92 @@ void MartusUnidades::setUnit(int type, position_s pos, int team, bool fog) {
 	return;
 }
 
-position_s MartusUnidades::getPosition() {
+position_s Unit::getPosition() {
 	return position;
 }
 
-int MartusUnidades::getTypeOfUnit() {
+int Unit::getTypeOfUnit() {
 	return typeOfUnit;
 }
 
-int MartusUnidades::getTeam() {
+int Unit::getTeam() {
 	return team;
 }
 
-bool MartusUnidades::getFog() {
+bool Unit::getFog() {
 	return fog;
 }
 
-void MartusUnidades::setFogOn() {
+void Unit::setFogOn() {
 	fog = true;
 	return;
 }
 
-
-
-
-void MartusTerrains::setTerrain(terrains_d type, position_s pos, bool fog) {
+void Terrain::setTerrain(terrains_d type, position_s pos, bool fog) {
 	this->typeOfTerrain = type;
 	this->position = pos;
 	this->fog = fog;
 	return;
 }
 
-position_s MartusTerrains::getPosition() {
+position_s Terrain::getPosition() {
 	return position;
 }
 
-int MartusTerrains::getTypeOfTerrain() {
+int Terrain::getTypeOfTerrain() {
 	return typeOfTerrain;
 }
 
-bool MartusTerrains::getFog() {
+bool Terrain::getFog() {
 	return fog;
 }
 
-void MartusTerrains::setFogOn() {
+void Terrain::setFogOn() {
 	fog = true;
 	return;
 }
 
-
-
-
-void MartusBuildings::setBuilding(int type, position_s pos, int team, bool fog) {
+void Building::setBuilding(int type, position_s pos, int team, bool fog) {
 	this->typeOfBuilding = type;
 	this->position = pos;
 	this->team = team;
 	this->fog = fog;
 }
 
-position_s MartusBuildings::getPosition() {
+position_s Building::getPosition() {
 	return position;
 }
 
-int MartusBuildings::getTypeOfBuilding() {
+int Building::getTypeOfBuilding() {
 	return typeOfBuilding;
 }
 
-int MartusBuildings::getTeam() {
+int Building::getTeam() {
 	return team;
 }
 
-bool MartusBuildings::getFog() {
+bool Building::getFog() {
 	return fog;
 }
 
-void MartusBuildings::setFogOn() {
+void Building::setFogOn() {
 	fog = true;
 	return;
 }
 
-
-
-
-std::vector<MartusBuildings> MartusMap::getBuildings() {
+std::vector<Building> Map::getBuildings() {
 	return buildings;
 }
 
-std::vector<MartusTerrains>	MartusMap::getTerrains() {
+std::vector<Terrain> Map::getTerrains() {
 	return terrains;
 }
 
-std::vector<MartusUnidades> MartusMap::getUnits() {
+std::vector<Unit> Map::getUnits() {
 	return units;
 }
 
-bool MartusMap::isThereAUnitThere(int x, int y) {
+bool Map::isThereAUnitThere(int x, int y) {
 	bool answer = false;
 	for (unsigned int i = 0; i <= units.size(); i++) {
 		if (units[i].getPosition().x == x && units[i].getPosition().y == y) {
@@ -113,7 +104,7 @@ bool MartusMap::isThereAUnitThere(int x, int y) {
 	return answer;
 }
 
-bool MartusMap::isThereABuildingThere(int x, int y) {
+bool Map::isThereABuildingThere(int x, int y) {
 	bool answer = false;
 	for (unsigned int i = 0; i <= buildings.size(); i++) {
 		if (buildings[i].getPosition().x == x && buildings[i].getPosition().y == y) {
@@ -123,7 +114,7 @@ bool MartusMap::isThereABuildingThere(int x, int y) {
 	return answer;
 }
 
-options_s MartusMap::getOptions(int x, int y) {
+options_s Map::getOptions(int x, int y) {
 	options_s tmp;
 	tmp.attackDownAvailable = false;
 	tmp.attackLeftAvailable = false;
@@ -175,7 +166,7 @@ options_s MartusMap::getOptions(int x, int y) {
 	return tmp;
 }
 
-bool MartusMap::isThereAnEnemyThere(int x, int y, int enemyTeam) {
+bool Map::isThereAnEnemyThere(int x, int y, int enemyTeam) {
 	bool exit = false;
 
 	for (unsigned int i = 0; i < units.size(); i++) {
@@ -195,7 +186,7 @@ bool MartusMap::isThereAnEnemyThere(int x, int y, int enemyTeam) {
 	return exit;
 }
 
-bool MartusMap::isThereAFriendUnitThere(int x, int y) {
+bool Map::isThereAFriendUnitThere(int x, int y) {
 	bool answer = false;
 	for (unsigned int i = 0; i < units.size(); i++) {
 		if (units[i].getPosition().x == x && units[i].getPosition().y == y) {
@@ -207,7 +198,7 @@ bool MartusMap::isThereAFriendUnitThere(int x, int y) {
 	return answer;
 }
 
-bool MartusMap::isThereAFriendBuildingThere(int x, int y) {
+bool Map::isThereAFriendBuildingThere(int x, int y) {
 	bool answer = false;
 	for (unsigned int i = 0; i < buildings.size(); i++) {
 		if (buildings[i].getPosition().x == x && buildings[i].getPosition().y == y) {
@@ -219,52 +210,52 @@ bool MartusMap::isThereAFriendBuildingThere(int x, int y) {
 	return answer;
 }
 
-int MartusMap::getTeam() {
+int Map::getTeam() {
 	return this->team;
 }
 
-int MartusMap::getEnemyTeam() {
+int Map::getEnemyTeam() {
 	return this->enemyTeam;
 }
 
-void MartusMap::setTeam(int tmp) {
+void Map::setTeam(int tmp) {
 	this->team = tmp;
 	return;
 }
 
-void MartusMap::setEnemyTeam(int tmp) {
+void Map::setEnemyTeam(int tmp) {
 	this->enemyTeam = tmp;
 	return;
 }
 
-void MartusMap::addTerrain(MartusTerrains newTerrain) {
+void Map::addTerrain(Terrain newTerrain) {
 	this->terrains.push_back(newTerrain);
 	return;
 }
 
-void MartusMap::addBuilding(MartusBuildings newBuilding) {
+void Map::addBuilding(Building newBuilding) {
 	this->buildings.push_back(newBuilding);
 	return;
 }
 
-void MartusMap::addUnit(MartusUnidades newUnit) {
+void Map::addUnit(Unit newUnit) {
 	this->units.push_back(newUnit);
 	return;
 }
 
-void MartusMap::setTerrains(std::vector<MartusTerrains> newTerr) {
+void Map::setTerrains(std::vector<Terrain> newTerr) {
 	this->terrains.clear();
 	this->terrains = newTerr;
 	return;
 }
 
-void MartusMap::setBuildings(std::vector<MartusBuildings> newBuild) {
+void Map::setBuildings(std::vector<Building> newBuild) {
 	this->buildings.clear();
 	this->buildings = newBuild;
 	return;
 }
 
-void MartusMap::setUnits(std::vector<MartusUnidades> newUnits) {
+void Map::setUnits(std::vector<Unit> newUnits) {
 	this->units.clear();
 	this->units = newUnits;
 	return;

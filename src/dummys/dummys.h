@@ -30,7 +30,7 @@ typedef struct{
     bool passAvailable;
 }options_s;
 
-class MartusUnidades
+class Unit
 {
 public:
 	void setUnit(int type, position_s pos, int team, bool fog);
@@ -48,7 +48,7 @@ private:
     int typeOfUnit;
 };
 
-class MartusTerrains
+class Terrain
 {
 public:
 	void setTerrain(terrains_d type, position_s pos, bool fog);
@@ -64,7 +64,7 @@ private:
     int typeOfTerrain;
 };
 
-class MartusBuildings
+class Building
 {
 public:
 	void setBuilding(int type, position_s pos, int team, bool fog);
@@ -83,18 +83,18 @@ private:
 	int typeOfBuilding;
 };
 
-class MartusMap
+class Map
 {
 public:
-    std::vector<MartusBuildings> getBuildings();
-    std::vector<MartusTerrains> getTerrains();
-    std::vector<MartusUnidades> getUnits();
-	void setTerrains(std::vector<MartusTerrains> newTerr);
-	void setBuildings(std::vector<MartusBuildings> newBuild);
-	void setUnits(std::vector<MartusUnidades> newUnits);
-	void addTerrain(MartusTerrains newTerrain);
-	void addBuilding(MartusBuildings newBuilding);
-	void addUnit(MartusUnidades newUnit);
+    std::vector<Building> getBuildings();
+    std::vector<Terrain> getTerrains();
+    std::vector<Unit> getUnits();
+	void setTerrains(std::vector<Terrain> newTerr);
+	void setBuildings(std::vector<Building> newBuild);
+	void setUnits(std::vector<Unit> newUnits);
+	void addTerrain(Terrain newTerrain);
+	void addBuilding(Building newBuilding);
+	void addUnit(Unit newUnit);
     bool isThereAUnitThere(int x, int y);
     bool isThereABuildingThere(int x, int y);
     options_s getOptions(int x , int y);
@@ -106,9 +106,9 @@ protected:
 	bool isThereAnEnemyThere(int x,int y, int enemyTeam);
 	bool isThereAFriendUnitThere(int x, int y);
 	bool isThereAFriendBuildingThere(int x, int y);
-    std::vector<MartusBuildings> buildings;
-    std::vector<MartusTerrains> terrains;
-    std::vector<MartusUnidades> units;
+    std::vector<Building> buildings;
+    std::vector<Terrain> terrains;
+    std::vector<Unit> units;
 private:
 	int team;
 	int enemyTeam;
