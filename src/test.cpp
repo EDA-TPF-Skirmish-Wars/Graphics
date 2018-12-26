@@ -81,6 +81,6 @@ int main(void) {
 	tstMap.addUnit(tstUnit);
 	tstGr.updateGraphics(tstMap);
 	act = tstGr.getUserAction();
-	tstGr.showDices((rand()%6)+1, (rand()%6)+1);
+	tstGr.showDices((rand()%6)+1, (rand()%6)+1, true);
 	return 0;
 }

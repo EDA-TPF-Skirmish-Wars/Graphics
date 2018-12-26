@@ -17,6 +17,8 @@
 
 
 
+
+
 Graphics::Graphics(Map myMap) {
 	this->graphicsError = G_NO_ERROR;
 	this->myMap = myMap;
@@ -66,7 +68,9 @@ Graphics::Graphics(Map myMap) {
 		graphicsError = G_AUDIO_ERROR;
 	}
 	al_set_sample_instance_playmode(sample, ALLEGRO_PLAYMODE_LOOP);
+#ifdef PLAYMUSIC
 	al_play_sample_instance(sample);
+#endif // PLAYMUSIC
 
 	font = al_load_font("resources/font.ttf", FONT_SIZE_SMALL, 0); //VER SI ESTOS 2 CEROS ESTAN BIEN
 	if (font == NULL) {
@@ -478,7 +482,7 @@ void Graphics::displayActionInvalid() {
 	return;
 }
 
-void Graphics::showDices(int yours, int enemys) {
+void Graphics::showDices(int yours, int enemys, bool youWin) {
 	if (graphicsError == G_NO_ERROR) {
 		al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 5, TILE_SIDE, 0, "The Dices Were:");
 		string str1, str2, str3, str;
@@ -486,7 +490,7 @@ void Graphics::showDices(int yours, int enemys) {
 		str2 = std::to_string(enemys);
 		str = str1 + "   " + str2;
 		al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 7, TILE_SIDE * 2, 0, str.c_str());
-		if (yours > enemys) {
+		if (youWin) {
 			al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 6, TILE_SIDE * 3, 0, "You Win!");
 		}
 		else {
@@ -702,36 +706,54 @@ void Graphics::reDrawSide() {
 
 void Graphics::introduction() {
 	if (graphicsError == G_NO_ERROR) {
-		ALLEGRO_BITMAP * bmp = al_load_bitmap("./resources/banner.png");
-		if (bmp != NULL) {
+		ALLEGRO_BITMAP * bmp1 = al_load_bitmap("./resources/banner.png");
+		if (bmp1 != NULL) {
 			//timerMiliseconds(1000);
 			for (int i = DISPLAY_HEIGHT; i > 0; i--) {
 				al_clear_to_color(al_map_rgb(255, 255, 255));
-				al_draw_scaled_bitmap(bmp, 0, 0, 1000, 500, 0, i, DISPLAY_WIDTH,DISPLAY_HEIGHT +i, 0);
+				al_draw_scaled_bitmap(bmp1, 0, 0, 1000, 500, 0, i, DISPLAY_WIDTH,DISPLAY_HEIGHT +i, 0);
 				if (graphicsError == G_NO_ERROR) {
 					al_flip_display();
 				}
 				timerMiliseconds(10);
 			}
-			al_destroy_bitmap(bmp);
+			//al_destroy_bitmap(bmp);
 		}
 		else {
 			graphicsError = G_LOAD_BITMAP_ERROR;
 		}
-		bmp = al_load_bitmap("./resources/pressstart.png");
+		ALLEGRO_BITMAP * bmp = al_load_bitmap("./resources/pressstart.png");
 		if (bmp != NULL && graphicsError == G_NO_ERROR) {
 			al_draw_bitmap(bmp, TILE_SIDE * 5, TILE_SIDE * 8,0);
 			if (graphicsError == G_NO_ERROR) {
 				al_flip_display();
 			}
-			al_destroy_bitmap(bmp);
+			//al_destroy_bitmap(bmp);
 		}
 		else {
 			graphicsError = G_LOAD_BITMAP_ERROR;
 		}
 		ALLEGRO_EVENT ev;
 		bool tmp = false;
+		bool tmp2 = true;
+		timerNB(1000);
 		while (!tmp) {
+			if (isTimerFinished()) {
+				timerNB(1000);
+				if (tmp2) {
+					al_clear_to_color(al_map_rgb(255, 255, 255));
+					al_draw_scaled_bitmap(bmp1, 0, 0, 1000, 500, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
+					al_draw_bitmap(bmp, TILE_SIDE * 5, TILE_SIDE * 8, 0);
+					al_flip_display();
+
+				}
+				else {
+					al_clear_to_color(al_map_rgb(255, 255, 255));
+					al_draw_scaled_bitmap(bmp1, 0, 0, 1000, 500, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
+					al_flip_display();
+				}
+				tmp2 = !tmp2;
+			}
 			al_wait_for_event(evQueue, &ev);
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || ev.type == ALLEGRO_EVENT_KEY_DOWN
 				|| ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
@@ -744,6 +766,8 @@ void Graphics::introduction() {
 		if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			graphicsError = G_GAME_CLOSED;
 		}
+		al_destroy_bitmap(bmp1);
+		al_destroy_bitmap(bmp);
 	}
 	return;
 }

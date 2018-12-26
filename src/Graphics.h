@@ -23,6 +23,7 @@
 #include <iostream>
 #include <vector>
 #define DEBUG
+#define PLAYMUSIC
 
 #ifdef  DEBUG
     #include "./dummys/dummys.h"
@@ -100,8 +101,10 @@ Devuelve: una action_s
 	permitida por las reglas del juego. Es bloqueante.
 	*/
 
-	void showDices(int yours, int enemys);//Funciona perfecta
+	void showDices(int yours, int enemys, bool youWin);//Funciona perfecta
 	/*Funcion encargada de mostrar el resultado de los dados obtenido en alguna parte del juego, es bloqueante.
+	Recibe el valor de los dados tirados, y una variable que debe ser True si el usuario gano y false si perdio, esto
+	esta para definir en los casos de empate.
 	*/
 
 protected:
