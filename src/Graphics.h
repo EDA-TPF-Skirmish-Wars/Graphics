@@ -29,14 +29,6 @@
     #include "./dummys/dummys.h"
 #endif
 
-
-#ifdef __linux__
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_font.h>
-
-#elif _WIN32
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
@@ -44,7 +36,6 @@
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
-#endif
 
 
 
@@ -71,24 +62,22 @@ typedef struct {
 class Graphics
 {
 public:
-	Graphics(Map myMap);//Funciona perfecta
-/*Funcion de inicializacion de la clase, se le debe pasar un mapa con edificios, terrenos y unidades cargados
-NO devuelve nada.
-*/
+	Graphics();//Funciona perfecta
+	/*Funcion de inicializacion de la clase
+	NO devuelve nada.
+	*/
     ~Graphics();//Funciona perfecta
-    
-    //introduction(); //poner algun presentacion al juego para hacerlo mas copado
 
     errors_s updateGraphics(Map newMap); //Funciona perfecta
-/*  Esta funcion se la utiliza para actualizar los vectores de unidades y de edificios que fueron modificados por el
-jugador oponente. Se le pasa el nuevo mapa, con los nuevos vectores de unidades y edificios que actualiza el vector contenido
-dentro de esta clase. Y una vez actualizado grafica todas las lineas del mapa para que se vean en pantalla.
-Devuelve: un errors_s que estan especificados al principio de este archivo
-*/
+	/*  Esta funcion se la utiliza para actualizar los vectores de unidades y de edificios que fueron modificados por el
+	jugador oponente. Se le pasa el nuevo mapa, con los nuevos vectores de unidades y edificios que actualiza el vector contenido
+	dentro de esta clase. Y una vez actualizado grafica todas las lineas del mapa para que se vean en pantalla.
+	Devuelve: un errors_s que estan especificados al principio de este archivo
+	*/
     action_s getUserAction();//Funciona perfecta
-/*Funcion encargada de obtener los movimientos que haga el usuario.
-Devuelve: una action_s
-*/
+	/*Funcion encargada de obtener los movimientos que haga el usuario.
+	Devuelve: una action_s
+	*/
 
 	errors_s getError();
 	/*Funcion encargada de devolver un error_s, en caso de devolver algo distinto a G_NO_ERROR, se debe proceder a cerrar el juego
@@ -106,6 +95,8 @@ Devuelve: una action_s
 	Recibe el valor de los dados tirados, y una variable que debe ser True si el usuario gano y false si perdio, esto
 	esta para definir en los casos de empate.
 	*/
+
+	
 
 protected:
     Map myMap;
@@ -126,7 +117,10 @@ private:
 	string getTerrainImagePath(Terrain terrain, std::vector<Terrain> list);//Funciona perfecta
 	string getUnitImagePath(int typeUnit, int team);//Funciona perfecta
 	void reDrawSide();//Funciona perfecta
-	void introduction();
+	void introduction(); //Funciona perfecta
+	void chooseMap();//Funciona perfecta
+	string dispChoose();//Funciona perfecta
+	void setTeam();//Funciona perfecta
 
     ALLEGRO_DISPLAY * display = NULL;
     ALLEGRO_EVENT_QUEUE * evQueue = NULL;

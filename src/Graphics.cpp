@@ -1,5 +1,6 @@
 #include "./Graphics.h"
 #include "../Network/Timer.h"
+#include "./CSVParser/csv.h"
 #define DISPLAY_WIDTH   1100
 #define DISPLAY_HEIGHT  630
 #define DISPLAY_WIDTH_OFFSET    15
@@ -19,9 +20,9 @@
 
 
 
-Graphics::Graphics(Map myMap) {
+Graphics::Graphics() {
 	this->graphicsError = G_NO_ERROR;
-	this->myMap = myMap;
+	//this->myMap = myMap;
 	this->display = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 	if (display == NULL) {
 		graphicsError = G_DISPLAY_ERROR;
@@ -80,13 +81,21 @@ Graphics::Graphics(Map myMap) {
 	if (fontLarge == NULL) {
 		graphicsError = G_LOAD_FONT_ERROR;
 	}
-	introduction();
+	//introduction();
+
+	if (graphicsError == G_NO_ERROR) {
+		setTeam();
+	}
+	if (graphicsError == G_NO_ERROR) {
+		chooseMap();
+	}
 	if (graphicsError == G_NO_ERROR) {
 		drawMap();
 	}
 	if (graphicsError == G_NO_ERROR) {
 		al_flip_display();
 	}
+
     return;
 }
 
@@ -770,4 +779,375 @@ void Graphics::introduction() {
 		al_destroy_bitmap(bmp);
 	}
 	return;
+}
+
+void Graphics::chooseMap() {
+	string str = dispChoose();
+	io::CSVReader<16> in(str);//"./resources/maps/BalancedArena.csv");
+	//in.read_header(io::ignore_extra_column, "vendor", "size", "speed");
+	std::string col0, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12, col13, col14, col15;
+	int i = 0;
+	while (in.read_row(col0, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12, col13, col14, col15)) {
+		int u = 0;
+		string a;
+		for (u = 0; u < 16; u++) {
+			switch (u) {
+			case 0:
+				a = col0;
+				break;
+			case 1:
+				a = col1;
+				break;
+			case 2:
+				a = col2;
+				break;
+			case 3:
+				a = col3;
+				break;
+			case 4:
+				a = col4;
+				break;
+			case 5:
+				a = col5;
+				break;
+			case 6:
+				a = col6;
+				break;
+			case 7:
+				a = col7;
+				break;
+			case 8:
+				a = col8;
+				break;
+			case 9:
+				a = col9;
+				break;
+			case 10:
+				a = col10;
+				break;
+			case 11:
+				a = col11;
+				break;
+			case 12:
+				a = col12;
+				break;
+			case 13:
+				a = col13;
+				break;
+			case 14:
+				a = col14;
+				break;
+			case 15:
+				a = col15;
+				break;
+			default:
+				break;
+			}
+			position_s pos;
+			pos.x = u;
+			pos.y = i;
+			if (a.length() == 1) {
+				if (a == "t") {
+					Terrain newTerr;
+					newTerr.setTerrain(PLAIN, pos, false);
+					myMap.addTerrain(newTerr);
+				}
+				else if (a == "r") {
+					Terrain newTerr;
+					newTerr.setTerrain(RIVER, pos, false);
+					myMap.addTerrain(newTerr);
+				}
+				else if (a == "a") {
+					Terrain newTerr;
+					newTerr.setTerrain(STREET, pos, false);
+					myMap.addTerrain(newTerr);
+				}
+				else if (a == "f") {
+					Terrain newTerr;
+					newTerr.setTerrain(FOREST, pos, false);
+					myMap.addTerrain(newTerr);
+				}
+				else if (a == "h") {
+					Terrain newTerr;
+					newTerr.setTerrain(HILL, pos, false);
+					myMap.addTerrain(newTerr);
+				}
+			}
+			else if (a.length() == 2) {
+				if (a == "m0") {
+					Building newBuild;
+					newBuild.setBuilding(FACTORY, pos, NO_TEAM, false);
+					myMap.addBuilding(newBuild);
+				}
+				else if (a == "m1") {
+					Building newBuild;
+					newBuild.setBuilding(FACTORY, pos, myMap.getTeam(), false);
+					myMap.addBuilding(newBuild);
+				}
+				else if (a == "m2") {
+					Building newBuild;
+					newBuild.setBuilding(FACTORY, pos, myMap.getEnemyTeam(), false);
+					myMap.addBuilding(newBuild);
+				}
+				else if (a == "c0") {
+					Building newBuild;
+					newBuild.setBuilding(CITY, pos, NO_TEAM, false);
+					myMap.addBuilding(newBuild);
+				}
+				else if (a == "c1") {
+					Building newBuild;
+					newBuild.setBuilding(CITY, pos, myMap.getTeam(), false);
+					myMap.addBuilding(newBuild);
+				}
+				else if (a == "c2") {
+					Building newBuild;
+					newBuild.setBuilding(CITY, pos, myMap.getEnemyTeam(), false);
+					myMap.addBuilding(newBuild);
+				}
+				else if (a == "q1") {
+					Building newBuild;
+					newBuild.setBuilding(HQ, pos, myMap.getTeam(), false);
+					myMap.addBuilding(newBuild);
+				}
+				else if (a == "q2") {
+					Building newBuild;
+					newBuild.setBuilding(HQ, pos, myMap.getEnemyTeam(), false);
+					myMap.addBuilding(newBuild);
+				}
+			}
+			else if (a.length() == 5 && a[1] == '+') {
+				int tmp, tmp2;
+				if (a[0] == 't') {
+					Terrain newTerr;
+					newTerr.setTerrain(PLAIN, pos, false);
+					myMap.addTerrain(newTerr);
+				}
+				else if (a[0] == 'r') {
+					Terrain newTerr;
+					newTerr.setTerrain(RIVER, pos, false);
+					myMap.addTerrain(newTerr);
+				}
+				else if (a[0] == 'a') {
+					Terrain newTerr;
+					newTerr.setTerrain(STREET, pos, false);
+					myMap.addTerrain(newTerr);
+				}
+				else if (a[0] == 'f') {
+					Terrain newTerr;
+					newTerr.setTerrain(FOREST, pos, false);
+					myMap.addTerrain(newTerr);
+				}
+				else if (a[0] == 'h') {
+					Terrain newTerr;
+					newTerr.setTerrain(HILL, pos, false);
+					myMap.addTerrain(newTerr);
+				}
+				if (a[2] == 'i' && a[3] == 'n') {
+					tmp = INFANTRY;
+				}
+				else if (a[2] == 'm' && a[3] == 'e') {
+					tmp = MECH;
+				}
+				else if (a[2] == 'r' && a[3] == 'o') {
+					tmp = ROCKET;
+				}
+				else if (a[2] == 'r' && a[3] == 'e') {
+					tmp = RECON;
+				}
+				else if (a[2] == 'a' && a[3] == 'p') {
+					tmp = APC;
+				}
+				else if (a[2] == 'a' && a[3] == 'a') {
+					tmp = ANTIAIR;
+				}
+				else if (a[2] == 'a' && a[3] == 'r') {
+					tmp = ARTILLERY;
+				}
+				else if (a[2] == 'm' && a[3] == 't') {
+					tmp = MEDTANK;
+				}
+				else if (a[2] == 't' && a[3] == 'a') {
+					tmp = TANK;
+				}
+				if (a[4] == '1') {
+					tmp2 = myMap.getTeam();
+				}
+				else if (a[4] == '2') {
+					tmp2 = myMap.getEnemyTeam();
+				}
+				Unit newUnit;
+				newUnit.setUnit(tmp, pos, tmp2, false);
+				myMap.addUnit(newUnit);
+			}
+			else if (a.length() == 6 && a[2] == '+') {
+				
+				
+				int temp, temp2;
+				if (a[0] == 'c') {
+					temp = CITY;
+				}
+				else if (a[0] == 'm') {
+					temp = FACTORY;
+				}
+				if (a[1] == '0') {
+					temp2 = NO_TEAM;
+				}
+				else if (a[1] == '1') {
+					temp2 = myMap.getTeam();
+				}
+				else if (a[1] == '2') {
+					temp2 = myMap.getEnemyTeam();
+				}
+				
+				
+				int tmp, tmp2;
+				if (a[3] == 'i' && a[4] == 'n') {
+					tmp = INFANTRY;
+				}
+				else if (a[3] == 'm' && a[4] == 'e') {
+					tmp = MECH;
+				}
+				else if (a[3] == 'r' && a[4] == 'o') {
+					tmp = ROCKET;
+				}
+				else if (a[3] == 'r' && a[4] == 'e') {
+					tmp = RECON;
+				}
+				else if (a[3] == 'a' && a[4] == 'p') {
+					tmp = APC;
+				}
+				else if (a[3] == 'a' && a[4] == 'a') {
+					tmp = ANTIAIR;
+				}
+				else if (a[3] == 'a' && a[4] == 'r') {
+					tmp = ARTILLERY;
+				}
+				else if (a[3] == 'm' && a[4] == 't') {
+					tmp = MEDTANK;
+				}
+				else if (a[3] == 't' && a[4] == 'a') {
+					tmp = TANK;
+				}
+				if (a[5] == '1') {
+					tmp2 = myMap.getTeam();
+				}
+				else if (a[5] == '2') {
+					tmp2 = myMap.getEnemyTeam();
+				}
+
+				Building newBuild;
+				newBuild.setBuilding(temp, pos, temp2, false);
+				Unit newUnit;
+				newUnit.setUnit(tmp, pos, tmp2, false);
+				myMap.addBuilding(newBuild);
+				myMap.addUnit(newUnit);
+			}
+		}
+		i++;
+		char * next_line();
+	}
+}
+
+string Graphics::dispChoose() {
+	al_clear_to_color(al_map_rgb(255, 255, 255));
+	al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 4,TILE_SIDE * 5, 0, "Press a number from 1 to 10 to choose a Map!");
+	al_flip_display();
+	ALLEGRO_EVENT ev;
+	string str;
+	bool tmp = true;
+	while (tmp) {
+		al_wait_for_event(evQueue, &ev);
+		if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+			tmp = false;
+			graphicsError = G_GAME_CLOSED;
+		}
+		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+			switch (ev.keyboard.keycode) {
+			case ALLEGRO_KEY_1:
+				str = "./resources/maps/BalancedArena.csv";
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_2:
+				str = "./resources/maps/BalancedRing.csv";
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_3:
+				str = "./resources/maps/BalancedCross.csv";
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_4:
+				str = "./resources/maps/IslandWar.csv";
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_5:
+				str = "./resources/maps/MystPi.csv";
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_6:
+				str = "./resources/maps/Nascar.csv";
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_7:
+				str = "./resources/maps/SanFranciscoBridge.csv";
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_8:
+				str = "./resources/maps/SnakeArena.csv";
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_9:
+				str = "./resources/maps/SuperS.csv";
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_0:
+				str = "./resources/maps/WaterWorld.csv";
+				tmp = false;
+				break;
+			}
+		}
+	}
+	al_clear_to_color(al_map_rgb(255, 255, 255));
+	al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 9, TILE_SIDE * 5, 0, "Please Wait!");
+	al_flip_display();
+	return str;
+
+}
+
+void Graphics::setTeam() {
+	al_clear_to_color(al_map_rgb(255, 255, 255));
+	al_draw_text(fontLarge, al_map_rgb(0, 0, 0), TILE_SIDE * 6, TILE_SIDE * 5, 0, "Choose a color for your team!");
+	al_flip_display();
+	ALLEGRO_EVENT ev;
+	bool tmp = true;
+	while (tmp) {
+		al_wait_for_event(evQueue, &ev);
+		if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+			tmp = false;
+			graphicsError = G_GAME_CLOSED;
+		}
+		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+			switch (ev.keyboard.keycode) {
+			case ALLEGRO_KEY_B:
+				myMap.setTeam(TEAM_BLUE);
+				myMap.setEnemyTeam(TEAM_RED);
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_R:
+				myMap.setTeam(TEAM_RED);
+				myMap.setEnemyTeam(TEAM_BLUE);
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_G:
+				myMap.setTeam(TEAM_GREEN);
+				myMap.setEnemyTeam(TEAM_YELLOW);
+				tmp = false;
+				break;
+			case ALLEGRO_KEY_Y:
+				myMap.setTeam(TEAM_YELLOW);
+				myMap.setEnemyTeam(TEAM_GREEN);
+				tmp = false;
+				break;
+			}
+		}
+	}
 }
