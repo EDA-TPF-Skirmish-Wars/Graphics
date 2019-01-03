@@ -18,12 +18,14 @@
 
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
-//#define FOW
+
 
 #include <iostream>
 #include <vector>
 #define DEBUG
 #define PLAYMUSIC
+#define SHOW_INTRODUCTION
+//#define FOW
 
 #ifdef  DEBUG
     #include "./dummys/dummys.h"

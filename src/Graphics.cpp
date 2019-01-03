@@ -1,6 +1,6 @@
 #include "./Graphics.h"
 #include "../Network/Timer.h"
-#include "./CSVParser/csv.h"
+#include "./CSVParser/CSVParser.h"
 #define DISPLAY_WIDTH   1100
 #define DISPLAY_HEIGHT  630
 #define DISPLAY_WIDTH_OFFSET    15
@@ -14,10 +14,6 @@
 #define WIDTH_POPUP     100
 #define POPUP_LINE      15  
 #define HEIGHT_POPUP    (POPUP_LINE * OPTIONS_MENU_AMOUNT)
-
-
-
-
 
 
 Graphics::Graphics() {
@@ -81,7 +77,9 @@ Graphics::Graphics() {
 	if (fontLarge == NULL) {
 		graphicsError = G_LOAD_FONT_ERROR;
 	}
-	//introduction();
+#ifdef SHOW_INTRODUCTION
+	introduction();
+#endif
 
 	if (graphicsError == G_NO_ERROR) {
 		setTeam();
